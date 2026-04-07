@@ -1,26 +1,45 @@
 @import "tailwindcss";
 
+/* STK / FJKM Canada Montréal — palette from org logo */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --stk-sky: #b0d4f1;
+  --stk-navy: #001f4d;
+  --stk-accent: #c86473;
+  --stk-sage: #b8d0b8;
+  --background: #f4f9fc;
+  --foreground: var(--stk-navy);
+  color-scheme: light;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-stk-sky: var(--stk-sky);
+  --color-stk-navy: var(--stk-navy);
+  --color-stk-accent: var(--stk-accent);
+  --color-stk-sage: var(--stk-sage);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-serif: var(--font-source-serif);
 }
 
 body {
-  background: var(--background);
+  background: linear-gradient(180deg, var(--stk-sky) 0%, #e8f4fb 28%, var(--background) 55%);
+  background-attachment: fixed;
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+html,
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-source-serif), ui-serif, Georgia, serif;
+  color: var(--stk-navy);
+  letter-spacing: -0.02em;
 }

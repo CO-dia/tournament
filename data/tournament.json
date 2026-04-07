@@ -1,0 +1,340 @@
+{
+  "slots": [
+    {
+      "slot": 1,
+      "assignedName": "Montoya"
+    },
+    {
+      "slot": 2,
+      "assignedName": "Vao mianatra"
+    },
+    {
+      "slot": 3,
+      "assignedName": "Momo's bros"
+    },
+    {
+      "slot": 4,
+      "assignedName": "STK QC"
+    },
+    {
+      "slot": 5,
+      "assignedName": "Haikyuu"
+    },
+    {
+      "slot": 6,
+      "assignedName": "STK PENIELA FILADELFIA"
+    },
+    {
+      "slot": 7,
+      "assignedName": "STK Ottawa"
+    },
+    {
+      "slot": 8,
+      "assignedName": "STK MTL 2"
+    },
+    {
+      "slot": 9,
+      "assignedName": "Oye Oye"
+    }
+  ],
+  "matches": [
+    {
+      "id": "S1",
+      "phase": "group",
+      "startsAt": "2026-04-11T14:15:00.000Z",
+      "court": 1,
+      "homeSlot": 1,
+      "awaySlot": 9,
+      "refereeSlot": 4,
+      "homeScore": null,
+      "awayScore": null
+    },
+    {
+      "id": "S2",
+      "phase": "group",
+      "startsAt": "2026-04-11T14:15:00.000Z",
+      "court": 2,
+      "homeSlot": 2,
+      "awaySlot": 8,
+      "refereeSlot": 5,
+      "homeScore": null,
+      "awayScore": null
+    },
+    {
+      "id": "S3",
+      "phase": "group",
+      "startsAt": "2026-04-11T14:15:00.000Z",
+      "court": 3,
+      "homeSlot": 3,
+      "awaySlot": 7,
+      "refereeSlot": 6,
+      "homeScore": null,
+      "awayScore": null
+    },
+    {
+      "id": "S4",
+      "phase": "group",
+      "startsAt": "2026-04-11T14:45:00.000Z",
+      "court": 1,
+      "homeSlot": 4,
+      "awaySlot": 6,
+      "refereeSlot": 1,
+      "homeScore": null,
+      "awayScore": null
+    },
+    {
+      "id": "S5",
+      "phase": "group",
+      "startsAt": "2026-04-11T14:45:00.000Z",
+      "court": 2,
+      "homeSlot": 2,
+      "awaySlot": 5,
+      "refereeSlot": 3,
+      "homeScore": null,
+      "awayScore": null
+    },
+    {
+      "id": "S6",
+      "phase": "group",
+      "startsAt": "2026-04-11T14:45:00.000Z",
+      "court": 3,
+      "homeSlot": 8,
+      "awaySlot": 9,
+      "refereeSlot": 7,
+      "homeScore": null,
+      "awayScore": null
+    },
+    {
+      "id": "S7",
+      "phase": "group",
+      "startsAt": "2026-04-11T15:15:00.000Z",
+      "court": 1,
+      "homeSlot": 1,
+      "awaySlot": 8,
+      "refereeSlot": 4,
+      "homeScore": null,
+      "awayScore": null
+    },
+    {
+      "id": "S8",
+      "phase": "group",
+      "startsAt": "2026-04-11T15:15:00.000Z",
+      "court": 2,
+      "homeSlot": 2,
+      "awaySlot": 7,
+      "refereeSlot": 5,
+      "homeScore": null,
+      "awayScore": null
+    },
+    {
+      "id": "S9",
+      "phase": "group",
+      "startsAt": "2026-04-11T15:15:00.000Z",
+      "court": 3,
+      "homeSlot": 3,
+      "awaySlot": 6,
+      "refereeSlot": 9,
+      "homeScore": null,
+      "awayScore": null
+    },
+    {
+      "id": "S10",
+      "phase": "group",
+      "startsAt": "2026-04-11T15:45:00.000Z",
+      "court": 1,
+      "homeSlot": 4,
+      "awaySlot": 5,
+      "refereeSlot": 1,
+      "homeScore": null,
+      "awayScore": null
+    },
+    {
+      "id": "S11",
+      "phase": "group",
+      "startsAt": "2026-04-11T15:45:00.000Z",
+      "court": 2,
+      "homeSlot": 3,
+      "awaySlot": 9,
+      "refereeSlot": 2,
+      "homeScore": null,
+      "awayScore": null
+    },
+    {
+      "id": "S12",
+      "phase": "group",
+      "startsAt": "2026-04-11T15:45:00.000Z",
+      "court": 3,
+      "homeSlot": 7,
+      "awaySlot": 8,
+      "refereeSlot": 6,
+      "homeScore": null,
+      "awayScore": null
+    },
+    {
+      "id": "S13",
+      "phase": "group",
+      "startsAt": "2026-04-11T16:15:00.000Z",
+      "court": 1,
+      "homeSlot": 1,
+      "awaySlot": 7,
+      "refereeSlot": 4,
+      "homeScore": null,
+      "awayScore": null
+    },
+    {
+      "id": "S14",
+      "phase": "group",
+      "startsAt": "2026-04-11T16:15:00.000Z",
+      "court": 2,
+      "homeSlot": 2,
+      "awaySlot": 6,
+      "refereeSlot": 8,
+      "homeScore": null,
+      "awayScore": null
+    },
+    {
+      "id": "S15",
+      "phase": "group",
+      "startsAt": "2026-04-11T16:15:00.000Z",
+      "court": 3,
+      "homeSlot": 3,
+      "awaySlot": 5,
+      "refereeSlot": 9,
+      "homeScore": null,
+      "awayScore": null
+    },
+    {
+      "id": "S16",
+      "phase": "group",
+      "startsAt": "2026-04-11T16:45:00.000Z",
+      "court": 1,
+      "homeSlot": 2,
+      "awaySlot": 4,
+      "refereeSlot": 1,
+      "homeScore": null,
+      "awayScore": null
+    },
+    {
+      "id": "S17",
+      "phase": "group",
+      "startsAt": "2026-04-11T16:45:00.000Z",
+      "court": 2,
+      "homeSlot": 5,
+      "awaySlot": 8,
+      "refereeSlot": 2,
+      "homeScore": null,
+      "awayScore": null
+    },
+    {
+      "id": "S18",
+      "phase": "group",
+      "startsAt": "2026-04-11T16:45:00.000Z",
+      "court": 3,
+      "homeSlot": 1,
+      "awaySlot": 5,
+      "refereeSlot": 3,
+      "homeScore": null,
+      "awayScore": null
+    },
+    {
+      "id": "S19",
+      "phase": "group",
+      "startsAt": "2026-04-11T17:15:00.000Z",
+      "court": 1,
+      "homeSlot": 1,
+      "awaySlot": 6,
+      "refereeSlot": 2,
+      "homeScore": null,
+      "awayScore": null
+    },
+    {
+      "id": "S20",
+      "phase": "group",
+      "startsAt": "2026-04-11T17:15:00.000Z",
+      "court": 3,
+      "homeSlot": 3,
+      "awaySlot": 4,
+      "refereeSlot": 5,
+      "homeScore": null,
+      "awayScore": null
+    },
+    {
+      "id": "S21",
+      "phase": "group",
+      "startsAt": "2026-04-11T17:45:00.000Z",
+      "court": 1,
+      "homeSlot": 6,
+      "awaySlot": 7,
+      "refereeSlot": 5,
+      "homeScore": null,
+      "awayScore": null
+    },
+    {
+      "id": "S22",
+      "phase": "group",
+      "startsAt": "2026-04-11T17:45:00.000Z",
+      "court": 2,
+      "homeSlot": 4,
+      "awaySlot": 9,
+      "refereeSlot": 8,
+      "homeScore": null,
+      "awayScore": null
+    },
+    {
+      "id": "S23",
+      "phase": "group",
+      "startsAt": "2026-04-11T18:15:00.000Z",
+      "court": 1,
+      "homeSlot": 7,
+      "awaySlot": 9,
+      "refereeSlot": 1,
+      "homeScore": null,
+      "awayScore": null
+    },
+    {
+      "id": "S24",
+      "phase": "group",
+      "startsAt": "2026-04-11T18:15:00.000Z",
+      "court": 2,
+      "homeSlot": 8,
+      "awaySlot": 3,
+      "refereeSlot": 2,
+      "homeScore": null,
+      "awayScore": null
+    },
+    {
+      "id": "S25",
+      "phase": "group",
+      "startsAt": "2026-04-11T18:45:00.000Z",
+      "court": 1,
+      "homeSlot": 5,
+      "awaySlot": 6,
+      "refereeSlot": 3,
+      "homeScore": null,
+      "awayScore": null
+    },
+    {
+      "id": "S26",
+      "phase": "group",
+      "startsAt": "2026-04-11T18:45:00.000Z",
+      "court": 2,
+      "homeSlot": 2,
+      "awaySlot": 9,
+      "refereeSlot": 7,
+      "homeScore": null,
+      "awayScore": null
+    },
+    {
+      "id": "S27",
+      "phase": "group",
+      "startsAt": "2026-04-11T18:45:00.000Z",
+      "court": 3,
+      "homeSlot": 4,
+      "awaySlot": 1,
+      "refereeSlot": 8,
+      "homeScore": null,
+      "awayScore": null
+    }
+  ],
+  "scoreHistory": []
+}
