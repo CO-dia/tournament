@@ -234,6 +234,42 @@ async function ensureDataFile() {
   }
 }
 
+/** Upstash Redis (e.g. Vercel → Storage → Redis) — avoids EROFS on serverless where /var/task is read-only. */
+const REDIS_STATE_KEY = "tournament:state";
+
+function isRedisBackend() {
+  return Boolean(
+    process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN,
+  );
+}
+
+async function readStateString(): Promise<string> {
+  if (isRedisBackend()) {
+    const { Redis } = await import("@upstash/redis");
+    const redis = Redis.fromEnv();
+    const v = await redis.get<string>(REDIS_STATE_KEY);
+    if (v === null || v === undefined) {
+      const initial = JSON.stringify(defaultState, null, 2);
+      await redis.set(REDIS_STATE_KEY, initial);
+      return initial;
+    }
+    return v;
+  }
+  await ensureDataFile();
+  return readFile(dataFile, "utf8");
+}
+
+async function writeStateString(json: string): Promise<void> {
+  if (isRedisBackend()) {
+    const { Redis } = await import("@upstash/redis");
+    const redis = Redis.fromEnv();
+    await redis.set(REDIS_STATE_KEY, json);
+    return;
+  }
+  await ensureDataFile();
+  await writeFile(dataFile, json, "utf8");
+}
+
 function backfillScoreHistory(matches: Match[]): ScoreHistoryEntry[] {
   return matches
     .filter((match) => match.homeScore !== null && match.awayScore !== null)
@@ -250,8 +286,7 @@ function backfillScoreHistory(matches: Match[]): ScoreHistoryEntry[] {
 }
 
 export async function getState(): Promise<TournamentState> {
-  await ensureDataFile();
-  const raw = await readFile(dataFile, "utf8");
+  const raw = await readStateString();
   let parsed = JSON.parse(raw) as TournamentState;
 
   if (!hasOfficialSchedule(parsed.matches)) {
@@ -264,7 +299,7 @@ export async function getState(): Promise<TournamentState> {
       matches: buildOfficialMatches(),
       scoreHistory: priorHistory,
     };
-    await writeFile(dataFile, JSON.stringify(migrated, null, 2), "utf8");
+    await writeStateString(JSON.stringify(migrated, null, 2));
     return migrated;
   }
 
@@ -273,15 +308,14 @@ export async function getState(): Promise<TournamentState> {
       ...parsed,
       scoreHistory: backfillScoreHistory(parsed.matches),
     };
-    await writeFile(dataFile, JSON.stringify(parsed, null, 2), "utf8");
+    await writeStateString(JSON.stringify(parsed, null, 2));
   }
 
   return parsed;
 }
 
 async function setState(next: TournamentState) {
-  await ensureDataFile();
-  await writeFile(dataFile, JSON.stringify(next, null, 2), "utf8");
+  await writeStateString(JSON.stringify(next, null, 2));
 }
 
 export async function updateDraw(assignments: Record<number, string | null>) {

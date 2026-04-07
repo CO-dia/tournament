@@ -1,3 +1,5 @@
+import { terrainPillClasses } from "@/lib/terrain-styles";
+
 type ResolvedMatch = {
   id: string;
   phase: string;
@@ -39,7 +41,9 @@ export function MatchTable({ matches }: { matches: ResolvedMatch[] }) {
             <tr key={match.id} className="transition-colors hover:bg-stk-sky/25">
               <td className="whitespace-nowrap px-4 py-3 text-stk-navy/90">{formatDateTime(match.startsAt)}</td>
               <td className="px-4 py-3">
-                <span className="inline-flex rounded-full bg-stk-sage/40 px-2.5 py-0.5 text-xs font-medium text-stk-navy">
+                <span
+                  className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${terrainPillClasses(match.court)}`}
+                >
                   Terrain {match.court}
                 </span>
               </td>

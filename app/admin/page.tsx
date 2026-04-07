@@ -11,7 +11,7 @@ export default async function AdminPage() {
     return (
       <>
         <MainNav />
-        <main className="mx-auto w-full max-w-xl flex-1 space-y-8 px-4 py-8 sm:px-6">
+        <main className="mx-auto min-w-0 w-full max-w-xl flex-1 space-y-8 px-4 py-8 sm:px-6">
           <section className="space-y-2 border-b border-stk-navy/10 pb-6">
             <p className="text-sm font-medium uppercase tracking-wider text-stk-accent">Restreint</p>
             <h1 className="text-3xl font-bold">Connexion admin</h1>
@@ -29,7 +29,7 @@ export default async function AdminPage() {
   return (
     <>
       <MainNav />
-      <main className="mx-auto w-full max-w-6xl flex-1 space-y-8 px-4 py-8 sm:px-6">
+      <main className="mx-auto min-w-0 w-full max-w-6xl flex-1 space-y-8 px-4 py-8 sm:px-6">
         <section className="space-y-2 border-b border-stk-navy/10 pb-6">
           <p className="text-sm font-medium uppercase tracking-wider text-stk-accent">Organisation</p>
           <h1 className="text-3xl font-bold">Administration du tournoi</h1>

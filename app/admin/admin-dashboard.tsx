@@ -39,9 +39,9 @@ function selectableTeamsForSlot(
 }
 
 const inputClass =
-  "rounded-xl border border-stk-navy/15 bg-white px-3 py-2 text-sm text-stk-navy outline-none ring-stk-accent/30 transition-shadow focus:ring-2";
+  "min-w-0 w-full rounded-xl border border-stk-navy/15 bg-white px-3 py-2 text-sm text-stk-navy outline-none ring-stk-accent/30 transition-shadow focus:ring-2";
 const sectionClass =
-  "rounded-2xl border border-stk-navy/10 bg-white/90 p-5 shadow-md shadow-stk-navy/[0.06] backdrop-blur-sm";
+  "min-w-0 rounded-2xl border border-stk-navy/10 bg-white/90 p-5 shadow-md shadow-stk-navy/[0.06] backdrop-blur-sm";
 
 export function AdminDashboard({
   slots,
@@ -227,7 +227,7 @@ export function AdminDashboard({
           type="button"
           onClick={saveDraw}
           disabled={pending}
-          className="mt-6 rounded-full bg-stk-navy px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-stk-navy/90 disabled:opacity-60"
+          className="mt-6 w-full rounded-full bg-stk-navy px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-stk-navy/90 disabled:opacity-60 sm:w-auto"
         >
           Enregistrer le tirage
         </button>
@@ -239,8 +239,8 @@ export function AdminDashboard({
           Seuls les admins peuvent modifier les scores des matchs.
         </p>
 
-        <div className="mt-4 grid gap-3 sm:grid-cols-[2fr_1fr_1fr_auto] sm:items-end">
-          <label className="flex flex-col gap-1.5 text-sm">
+        <div className="mt-4 grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_auto] sm:items-end">
+          <label className="flex min-w-0 flex-col gap-1.5 text-sm">
             <span className="font-medium text-stk-navy">Match</span>
             <select
               className={inputClass}
@@ -255,8 +255,8 @@ export function AdminDashboard({
             </select>
           </label>
 
-          <label className="flex flex-col gap-1.5 text-sm">
-            <span className="font-medium text-stk-navy">
+          <label className="flex min-w-0 flex-col gap-1.5 text-sm">
+            <span className="min-w-0 font-medium text-stk-navy">
               {selectedMatch?.homeTeam ?? "Domicile"}
             </span>
             <input
@@ -268,8 +268,8 @@ export function AdminDashboard({
             />
           </label>
 
-          <label className="flex flex-col gap-1.5 text-sm">
-            <span className="font-medium text-stk-navy">
+          <label className="flex min-w-0 flex-col gap-1.5 text-sm">
+            <span className="min-w-0 font-medium text-stk-navy">
               {selectedMatch?.awayTeam ?? "Exterieur"}
             </span>
             <input
@@ -285,7 +285,7 @@ export function AdminDashboard({
             type="button"
             onClick={saveScore}
             disabled={pending || !selectedMatchId}
-            className="rounded-full bg-stk-accent px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-stk-accent/90 disabled:opacity-60"
+            className="w-full shrink-0 rounded-full bg-stk-accent px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-stk-accent/90 disabled:opacity-60 sm:w-auto sm:justify-self-end"
           >
             Enregistrer le score
           </button>
@@ -302,7 +302,7 @@ export function AdminDashboard({
             type="button"
             onClick={() => setClearModalOpen(true)}
             disabled={clearPending}
-            className="mt-3 rounded-full border border-red-600/50 bg-white px-5 py-2.5 text-sm font-semibold text-red-700 shadow-sm transition hover:bg-red-50 disabled:opacity-60"
+            className="mt-3 w-full max-w-full rounded-full border border-red-600/50 bg-white px-4 py-2.5 text-center text-sm font-semibold text-red-700 shadow-sm transition hover:bg-red-50 disabled:opacity-60 sm:w-auto sm:px-5"
           >
             Effacer tous les scores et l&apos;historique
           </button>

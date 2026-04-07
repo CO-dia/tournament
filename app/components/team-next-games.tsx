@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+import { terrainPillClasses } from "@/lib/terrain-styles";
+
 type TeamOption = {
   slot: number;
   assignedName: string | null;
@@ -74,7 +76,9 @@ export function TeamNextGames({ slots, matches }: { slots: TeamOption[]; matches
             >
               <span className="font-semibold text-stk-navy">{formatDateTime(match.startsAt)}</span>
               <span className="text-stk-navy/45"> · </span>
-              <span className="rounded-md bg-stk-sage/45 px-1.5 py-0.5 text-xs font-medium">Terrain {match.court}</span>
+              <span className={`rounded-md px-1.5 py-0.5 text-xs font-medium ${terrainPillClasses(match.court)}`}>
+                Terrain {match.court}
+              </span>
               <span className="text-stk-navy/45"> · </span>
               {match.homeTeam} vs {match.awayTeam}
             </li>
