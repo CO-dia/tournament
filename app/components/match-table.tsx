@@ -1,4 +1,5 @@
 import { terrainPillClasses } from "@/lib/terrain-styles";
+import { formatMatchTime } from "@/lib/montreal-time";
 
 type ResolvedMatch = {
   id: string;
@@ -11,16 +12,6 @@ type ResolvedMatch = {
   homeScore: number | null;
   awayScore: number | null;
 };
-
-function formatDateTime(value: string) {
-  return new Date(value).toLocaleString(undefined, {
-    weekday: "short",
-    hour: "2-digit",
-    minute: "2-digit",
-    day: "2-digit",
-    month: "short",
-  });
-}
 
 export function MatchTable({ matches }: { matches: ResolvedMatch[] }) {
   return (
@@ -39,7 +30,7 @@ export function MatchTable({ matches }: { matches: ResolvedMatch[] }) {
         <tbody className="divide-y divide-stk-navy/[0.06]">
           {matches.map((match) => (
             <tr key={match.id} className="transition-colors hover:bg-stk-sky/25">
-              <td className="whitespace-nowrap px-4 py-3 text-stk-navy/90">{formatDateTime(match.startsAt)}</td>
+              <td className="whitespace-nowrap px-4 py-3 text-stk-navy/90">{formatMatchTime(match.startsAt)}</td>
               <td className="px-4 py-3">
                 <span
                   className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${terrainPillClasses(match.court)}`}

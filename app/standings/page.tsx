@@ -1,14 +1,8 @@
 import { MainNav } from "@/app/components/nav";
 import { StandingsQuickScore } from "@/app/components/standings-quick-score";
 import { isAdminAuthenticated } from "@/lib/auth";
+import { formatMatchTime } from "@/lib/montreal-time";
 import { getResolvedMatches, getStandings, getState } from "@/lib/tournament";
-
-function formatHistoryDate(iso: string) {
-  return new Date(iso).toLocaleString(undefined, {
-    dateStyle: "short",
-    timeStyle: "short",
-  });
-}
 
 export default async function StandingsPage() {
   const [state, isAdmin] = await Promise.all([getState(), isAdminAuthenticated()]);
@@ -95,7 +89,7 @@ export default async function StandingsPage() {
               <table className="min-w-full text-sm">
                 <thead className="bg-stk-navy/[0.07] text-left text-stk-navy">
                   <tr>
-                    <th className="px-4 py-3 font-semibold">Date / heure</th>
+                    <th className="px-4 py-3 font-semibold">Heure</th>
                     <th className="px-4 py-3 font-semibold">Match</th>
                     <th className="px-4 py-3 font-semibold">Score enregistré</th>
                   </tr>
@@ -103,7 +97,7 @@ export default async function StandingsPage() {
                 <tbody className="divide-y divide-stk-navy/[0.06]">
                   {history.map((entry, index) => (
                     <tr key={`${entry.matchId}-${entry.recordedAt}-${index}`} className="hover:bg-stk-sky/25">
-                      <td className="whitespace-nowrap px-4 py-3 text-stk-navy/90">{formatHistoryDate(entry.recordedAt)}</td>
+                      <td className="whitespace-nowrap px-4 py-3 text-stk-navy/90">{formatMatchTime(entry.recordedAt)}</td>
                       <td className="px-4 py-3 text-stk-navy">
                         <span className="font-mono text-xs text-stk-navy/50">{entry.matchId}</span>
                         <span className="mx-2 text-stk-navy/30">·</span>

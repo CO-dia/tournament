@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import { terrainPillClasses } from "@/lib/terrain-styles";
+import { formatMatchTime } from "@/lib/montreal-time";
 
 type TeamOption = {
   slot: number;
@@ -20,16 +21,6 @@ type ResolvedMatch = {
   homeScore: number | null;
   awayScore: number | null;
 };
-
-function formatDateTime(value: string) {
-  return new Date(value).toLocaleString(undefined, {
-    weekday: "short",
-    hour: "2-digit",
-    minute: "2-digit",
-    day: "2-digit",
-    month: "short",
-  });
-}
 
 export function TeamNextGames({ slots, matches }: { slots: TeamOption[]; matches: ResolvedMatch[] }) {
   const [selectedSlot, setSelectedSlot] = useState(slots[0]?.slot ?? 1);
@@ -74,7 +65,7 @@ export function TeamNextGames({ slots, matches }: { slots: TeamOption[]; matches
               key={match.id}
               className="rounded-xl border border-stk-navy/8 bg-gradient-to-r from-stk-sky/35 to-white px-4 py-3 text-sm text-stk-navy"
             >
-              <span className="font-semibold text-stk-navy">{formatDateTime(match.startsAt)}</span>
+              <span className="font-semibold text-stk-navy">{formatMatchTime(match.startsAt)}</span>
               <span className="text-stk-navy/45"> · </span>
               <span className={`rounded-md px-1.5 py-0.5 text-xs font-medium ${terrainPillClasses(match.court)}`}>
                 Terrain {match.court}

@@ -161,10 +161,13 @@ export const officialSeasonRows: OfficialSeasonRow[] = [
   },
 ];
 
-/** Same instant as stored on each match — use for calendar lookups. */
+/**
+ * Wall clock in Montréal on 2026-04-11 (EDT, UTC−4). Matches the calendrier "Horaire" column; safe on Vercel (UTC).
+ */
 export function timeToStartsAtIso(time: string) {
   const [hours, minutes] = time.split(":").map(Number);
-  return new Date(2026, 3, 11, hours, minutes, 0, 0).toISOString();
+  const utcMs = Date.UTC(2026, 3, 11, hours + 4, minutes, 0, 0);
+  return new Date(utcMs).toISOString();
 }
 
 function buildOfficialMatches(): Match[] {
@@ -332,9 +335,19 @@ export async function getState(): Promise<TournamentState> {
       parsed.scoreHistory && parsed.scoreHistory.length > 0
         ? parsed.scoreHistory
         : backfillScoreHistory(parsed.matches);
+    const byId = new Map(parsed.matches.map((m) => [m.id, m]));
+    const merged = buildOfficialMatches().map((om) => {
+      const old = byId.get(om.id);
+      if (!old) return om;
+      return {
+        ...om,
+        homeScore: old.homeScore,
+        awayScore: old.awayScore,
+      };
+    });
     const migrated: TournamentState = {
       ...parsed,
-      matches: buildOfficialMatches(),
+      matches: merged,
       scoreHistory: priorHistory,
     };
     await writeStateString(JSON.stringify(migrated, null, 2));

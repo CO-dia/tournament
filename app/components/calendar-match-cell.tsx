@@ -53,7 +53,7 @@ export function CalendarMatchCell({
         }),
       });
       if (!response.ok) throw new Error("save failed");
-      setMessage({ type: "success", text: "Score enregistre." });
+      setOpen(false);
       router.refresh();
     } catch {
       setMessage({ type: "error", text: "Echec de l'enregistrement." });
