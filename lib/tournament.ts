@@ -263,18 +263,32 @@ function assertWritableStateBackend(): void {
   }
 }
 
+/**
+ * Upstash may return either a string or a parsed object for JSON payloads.
+ * `JSON.parse(object)` stringifies to `"[object Object]"` and throws — normalize first.
+ */
+function redisStateValueToJsonString(v: unknown): string {
+  if (typeof v === "string") {
+    return v;
+  }
+  if (v !== null && typeof v === "object") {
+    return JSON.stringify(v);
+  }
+  throw new Error("Invalid tournament state in Redis");
+}
+
 async function readStateString(): Promise<string> {
   const rest = getRedisRestConfig();
   if (rest) {
     const { Redis } = await import("@upstash/redis");
     const redis = new Redis({ url: rest.url, token: rest.token });
-    const v = await redis.get<string>(REDIS_STATE_KEY);
+    const v = await redis.get(REDIS_STATE_KEY);
     if (v === null || v === undefined) {
       const initial = JSON.stringify(defaultState, null, 2);
       await redis.set(REDIS_STATE_KEY, initial);
       return initial;
     }
-    return v;
+    return redisStateValueToJsonString(v);
   }
   assertWritableStateBackend();
   await ensureDataFile();
