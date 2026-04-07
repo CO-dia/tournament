@@ -234,19 +234,40 @@ async function ensureDataFile() {
   }
 }
 
-/** Upstash Redis (e.g. Vercel → Storage → Redis) — avoids EROFS on serverless where /var/task is read-only. */
+/** Upstash Redis (e.g. Vercel Storage) — avoids EROFS on serverless where /var/task is read-only. */
 const REDIS_STATE_KEY = "tournament:state";
 
-function isRedisBackend() {
-  return Boolean(
-    process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN,
-  );
+/**
+ * `Redis.fromEnv()` only reads `UPSTASH_REDIS_*`. Vercel’s dashboard often exposes `KV_REST_API_*`
+ * instead — same REST API; use read/write `KV_REST_API_TOKEN`, not read-only.
+ */
+function getRedisRestConfig(): { url: string; token: string } | null {
+  const upstashUrl = process.env.UPSTASH_REDIS_REST_URL;
+  const upstashToken = process.env.UPSTASH_REDIS_REST_TOKEN;
+  if (upstashUrl && upstashToken) {
+    return { url: upstashUrl, token: upstashToken };
+  }
+  const kvUrl = process.env.KV_REST_API_URL;
+  const kvToken = process.env.KV_REST_API_TOKEN;
+  if (kvUrl && kvToken) {
+    return { url: kvUrl, token: kvToken };
+  }
+  return null;
+}
+
+function assertWritableStateBackend(): void {
+  if (process.env.VERCEL && !getRedisRestConfig()) {
+    throw new Error(
+      "Missing Redis REST credentials. In Vercel: link Storage → Redis, or set KV_REST_API_URL and KV_REST_API_TOKEN (or UPSTASH_REDIS_REST_URL + UPSTASH_REDIS_REST_TOKEN), then redeploy.",
+    );
+  }
 }
 
 async function readStateString(): Promise<string> {
-  if (isRedisBackend()) {
+  const rest = getRedisRestConfig();
+  if (rest) {
     const { Redis } = await import("@upstash/redis");
-    const redis = Redis.fromEnv();
+    const redis = new Redis({ url: rest.url, token: rest.token });
     const v = await redis.get<string>(REDIS_STATE_KEY);
     if (v === null || v === undefined) {
       const initial = JSON.stringify(defaultState, null, 2);
@@ -255,17 +276,20 @@ async function readStateString(): Promise<string> {
     }
     return v;
   }
+  assertWritableStateBackend();
   await ensureDataFile();
   return readFile(dataFile, "utf8");
 }
 
 async function writeStateString(json: string): Promise<void> {
-  if (isRedisBackend()) {
+  const rest = getRedisRestConfig();
+  if (rest) {
     const { Redis } = await import("@upstash/redis");
-    const redis = Redis.fromEnv();
+    const redis = new Redis({ url: rest.url, token: rest.token });
     await redis.set(REDIS_STATE_KEY, json);
     return;
   }
+  assertWritableStateBackend();
   await ensureDataFile();
   await writeFile(dataFile, json, "utf8");
 }
