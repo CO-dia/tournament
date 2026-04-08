@@ -21,6 +21,7 @@ const playoffsTemplate = [
   { stage: "Quart de finale 4", winnerTo: "Demi-finale 2", matchId: "QF4" },
   { stage: "Demi-finale 1", winnerTo: "Finale", matchId: "SF1" },
   { stage: "Demi-finale 2", winnerTo: "Finale", matchId: "SF2" },
+  { stage: "Petite finale (3e place)", winnerTo: "3e place", matchId: "TP1" },
   { stage: "Finale", winnerTo: "Champion", matchId: "F1" },
 ] as const;
 
@@ -161,7 +162,7 @@ export default async function CalendarPage() {
             scores des rounds precedents ne sont pas saisis.
           </p>
           <div className="overflow-x-auto rounded-2xl border border-stk-navy/10 bg-white/90 shadow-md shadow-stk-navy/[0.06] backdrop-blur-sm">
-            <table className="w-full min-w-[62rem] border-collapse text-base">
+            <table className="w-full min-w-[68rem] border-collapse text-base">
               <thead className="text-left text-stk-navy">
                 <tr className="bg-stk-navy/[0.07]">
                   <th className="whitespace-nowrap px-4 py-4 text-sm font-semibold sm:px-5 sm:py-4 sm:text-base">

@@ -12,6 +12,9 @@ export type PlayoffAfficheRow = {
 /** True when both sides are known teams (not "Vainqueur QF1" style placeholders). */
 export function isPlayoffScoreRowEditable(row: PlayoffAfficheRow): boolean {
   return (
-    !row.homeTeam.startsWith("Vainqueur") && !row.awayTeam.startsWith("Vainqueur")
+    !row.homeTeam.startsWith("Vainqueur") &&
+    !row.awayTeam.startsWith("Vainqueur") &&
+    !row.homeTeam.startsWith("Perdant") &&
+    !row.awayTeam.startsWith("Perdant")
   );
 }

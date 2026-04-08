@@ -358,8 +358,8 @@
     {
       "id": "QF3",
       "phase": "quarter",
-      "startsAt": "2026-04-12T19:45:00.000Z",
-      "court": 1,
+      "startsAt": "2026-04-12T19:15:00.000Z",
+      "court": 3,
       "homeSlot": 1,
       "awaySlot": 9,
       "homeScore": 25,
@@ -368,8 +368,8 @@
     {
       "id": "QF4",
       "phase": "quarter",
-      "startsAt": "2026-04-12T19:45:00.000Z",
-      "court": 2,
+      "startsAt": "2026-04-12T19:15:00.000Z",
+      "court": 4,
       "homeSlot": 5,
       "awaySlot": 3,
       "homeScore": 24,
@@ -378,7 +378,7 @@
     {
       "id": "SF1",
       "phase": "semi",
-      "startsAt": "2026-04-12T20:15:00.000Z",
+      "startsAt": "2026-04-12T19:45:00.000Z",
       "court": 1,
       "homeSlot": 8,
       "awaySlot": 7,
@@ -388,12 +388,22 @@
     {
       "id": "SF2",
       "phase": "semi",
-      "startsAt": "2026-04-12T20:15:00.000Z",
+      "startsAt": "2026-04-12T19:45:00.000Z",
       "court": 2,
       "homeSlot": 1,
       "awaySlot": 3,
       "homeScore": 19,
       "awayScore": 25
+    },
+    {
+      "id": "TP1",
+      "phase": "third",
+      "startsAt": "2026-04-12T20:15:00.000Z",
+      "court": 1,
+      "homeSlot": 1,
+      "awaySlot": 7,
+      "homeScore": null,
+      "awayScore": null
     },
     {
       "id": "F1",

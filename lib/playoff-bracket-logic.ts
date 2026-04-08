@@ -12,6 +12,12 @@ export function matchWinnerSlot(m: BracketMatch): number | null {
   return m.homeScore > m.awayScore ? m.homeSlot : m.awaySlot;
 }
 
+export function matchLoserSlot(m: BracketMatch): number | null {
+  const w = matchWinnerSlot(m);
+  if (w === null) return null;
+  return m.homeSlot === w ? m.awaySlot : m.homeSlot;
+}
+
 export function slotInQfMatch(slot: number, m: BracketMatch | undefined): boolean {
   return !!m && (m.homeSlot === slot || m.awaySlot === slot);
 }
@@ -78,6 +84,33 @@ export function shouldShowFinal(slot: number, bracket: BracketMatch[]): boolean 
   return fUnplayed;
 }
 
+export function shouldShowThirdPlace(slot: number, bracket: BracketMatch[]): boolean {
+  const tp1 = bracket.find((m) => m.id === "TP1");
+  if (
+    tp1 &&
+    slotInQfMatch(slot, tp1) &&
+    (tp1.homeScore === null || tp1.awayScore === null)
+  ) {
+    return true;
+  }
+
+  const sf1 = bracket.find((m) => m.id === "SF1");
+  const sf2 = bracket.find((m) => m.id === "SF2");
+  const w1 = sf1 ? matchWinnerSlot(sf1) : null;
+  const w2 = sf2 ? matchWinnerSlot(sf2) : null;
+
+  if (sf1 && sf1.homeScore !== null && sf1.awayScore !== null && w1 !== null) {
+    if (matchLoserSlot(sf1) === slot) return true;
+  }
+  if (sf2 && sf2.homeScore !== null && sf2.awayScore !== null && w2 !== null) {
+    if (matchLoserSlot(sf2) === slot) return true;
+  }
+
+  if (w1 === slot || w2 === slot) return false;
+
+  return shouldShowSf1(slot, bracket) || shouldShowSf2(slot, bracket);
+}
+
 /** Synthetic rows use homeSlot/awaySlot < 1 so they are not mistaken for real team slots. */
 export function teamSeesPlayoffResolvedRow(
   slot: number,
@@ -89,6 +122,7 @@ export function teamSeesPlayoffResolvedRow(
   if (row.homeSlot >= 1 && row.awaySlot >= 1) return false;
   if (row.id === "SF1") return shouldShowSf1(slot, bracket);
   if (row.id === "SF2") return shouldShowSf2(slot, bracket);
+  if (row.id === "TP1") return shouldShowThirdPlace(slot, bracket);
   if (row.id === "F1") return shouldShowFinal(slot, bracket);
   return false;
 }

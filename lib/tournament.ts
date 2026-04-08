@@ -4,7 +4,7 @@ import path from "node:path";
 import teamsFile from "@/data/teams.json";
 
 import type { PlayoffAfficheRow } from "./playoff-affiche-shared";
-import { matchWinnerSlot } from "./playoff-bracket-logic";
+import { matchLoserSlot, matchWinnerSlot } from "./playoff-bracket-logic";
 import { playoffCourt, playoffMatchStartIso } from "./playoff-schedule";
 
 export type { PlayoffAfficheRow } from "./playoff-affiche-shared";
@@ -17,7 +17,7 @@ export type TeamSlot = {
 
 export type Match = {
   id: string;
-  phase: "group" | "quarter" | "semi" | "final";
+  phase: "group" | "quarter" | "semi" | "third" | "final";
   startsAt: string;
   court: 1 | 2 | 3 | 4;
   homeSlot: number;
@@ -633,7 +633,41 @@ function syncPlayoffMatchesToState(state: TournamentState): TournamentState {
     finalBuilt = { ...oldFinal, court: playoffCourt("F1") };
   }
 
-  const playoffNext = [...qfBuilt, ...sfBuilt, ...(finalBuilt ? [finalBuilt] : [])];
+  const oldThird = playoffById.get("TP1");
+  let tp1Built: Match | null = null;
+  if (sf1 && sf2) {
+    const l1 = matchLoserSlot(sf1);
+    const l2 = matchLoserSlot(sf2);
+    if (l1 !== null && l2 !== null) {
+      const [hs, as] = orderSlotsByStandings(standings, l1, l2);
+      let homeSlot = hs;
+      let awaySlot = as;
+      if (oldThird && (oldThird.homeScore !== null || oldThird.awayScore !== null)) {
+        homeSlot = oldThird.homeSlot;
+        awaySlot = oldThird.awaySlot;
+      }
+      tp1Built = {
+        id: "TP1",
+        phase: "third",
+        startsAt: playoffMatchStartIso("TP1"),
+        court: playoffCourt("TP1"),
+        homeSlot,
+        awaySlot,
+        refereeSlot: oldThird?.refereeSlot,
+        homeScore: oldThird?.homeScore ?? null,
+        awayScore: oldThird?.awayScore ?? null,
+      };
+    }
+  } else if (oldThird && oldThird.homeScore !== null && oldThird.awayScore !== null) {
+    tp1Built = { ...oldThird, court: playoffCourt("TP1") };
+  }
+
+  const playoffNext = [
+    ...qfBuilt,
+    ...sfBuilt,
+    ...(tp1Built ? [tp1Built] : []),
+    ...(finalBuilt ? [finalBuilt] : []),
+  ];
   const nextMatches = [...groupMatches, ...playoffNext];
   if (JSON.stringify(state.matches) === JSON.stringify(nextMatches)) {
     return state;
@@ -669,8 +703,8 @@ function teamNameForSlot(
 }
 
 /**
- * Playoff affiches: quarts follow the live classement (top 8). Demi-finales and finale stay
- * placeholders until the previous round has recorded winners (or that round’s match is fully scored).
+ * Playoff affiches: quarts follow the live classement (top 8). Demi-finales, petite finale (3e) et finale
+ * restent en placeholders jusqu’aux resultats des rounds precedents.
  */
 export function getPlayoffAfficheRows(
   state: TournamentState,
@@ -773,6 +807,56 @@ export function getPlayoffAfficheRows(
   const sf1w = sf1 ? matchWinnerSlot(sf1) : null;
   const sf2w = sf2 ? matchWinnerSlot(sf2) : null;
 
+  const mThird = byId.get("TP1");
+  if (
+    mThird &&
+    mThird.homeScore !== null &&
+    mThird.awayScore !== null &&
+    matchWinnerSlot(mThird) !== null
+  ) {
+    rows.push({
+      matchId: "TP1",
+      homeTeam: teamNameForSlot(standings, state.slots, mThird.homeSlot),
+      awayTeam: teamNameForSlot(standings, state.slots, mThird.awaySlot),
+      homeScore: mThird.homeScore,
+      awayScore: mThird.awayScore,
+      refereeTeam: mThird.refereeSlot
+        ? getTeamName(state.slots, mThird.refereeSlot)
+        : null,
+    });
+  } else if (
+    sf1 &&
+    sf2 &&
+    matchWinnerSlot(sf1) !== null &&
+    matchWinnerSlot(sf2) !== null
+  ) {
+    const l1 = matchLoserSlot(sf1)!;
+    const l2 = matchLoserSlot(sf2)!;
+    const [homeSlot, awaySlot] = orderSlotsByStandings(standings, l1, l2);
+    const aligned = alignMatchScores(mThird, homeSlot, awaySlot);
+    rows.push({
+      matchId: "TP1",
+      homeTeam: teamNameForSlot(standings, state.slots, homeSlot),
+      awayTeam: teamNameForSlot(standings, state.slots, awaySlot),
+      homeScore: aligned.homeScore,
+      awayScore: aligned.awayScore,
+      refereeTeam: mThird?.refereeSlot
+        ? getTeamName(state.slots, mThird.refereeSlot)
+        : null,
+    });
+  } else {
+    rows.push({
+      matchId: "TP1",
+      homeTeam: "Perdant SF1",
+      awayTeam: "Perdant SF2",
+      homeScore: null,
+      awayScore: null,
+      refereeTeam: mThird?.refereeSlot
+        ? getTeamName(state.slots, mThird.refereeSlot)
+        : null,
+    });
+  }
+
   if (
     mFinal &&
     mFinal.homeScore !== null &&
@@ -830,13 +914,13 @@ export function getResolvedMatches(state: TournamentState) {
   const afficheById = new Map(getPlayoffAfficheRows(state).map((r) => [r.matchId, r]));
 
   const extras: typeof fromState = [];
-  for (const id of ["SF1", "SF2", "F1"] as const) {
+  for (const id of ["SF1", "SF2", "TP1", "F1"] as const) {
     if (byId.has(id)) continue;
     const row = afficheById.get(id);
     if (!row) continue;
     extras.push({
       id,
-      phase: id === "F1" ? "final" : "semi",
+      phase: id === "F1" ? "final" : id === "TP1" ? "third" : "semi",
       startsAt: playoffMatchStartIso(id),
       court: playoffCourt(id),
       homeSlot: -1,

@@ -13,19 +13,26 @@ export function playoffMatchStartIso(matchId: string): string {
   const start: Record<string, [number, number]> = {
     QF1: [15, 15],
     QF2: [15, 15],
-    QF3: [15, 45],
-    QF4: [15, 45],
-    SF1: [16, 15],
-    SF2: [16, 15],
+    QF3: [15, 15],
+    QF4: [15, 15],
+    SF1: [15, 45],
+    SF2: [15, 45],
+    TP1: [16, 15],
     F1: [17, 0],
   };
   const [h, min] = start[matchId] ?? [15, 15];
   return montrealLocalToIso(h, min);
 }
 
-/** Terrain 1: quarts (1) et (3), demi-finale (1), finale. Terrain 2: le reste. */
-export function playoffCourt(matchId: string): 1 | 2 {
-  if (matchId === "QF1" || matchId === "QF3" || matchId === "SF1" || matchId === "F1") {
+/**
+ * Terrain 1: quart (1), demi-finale (1), petite finale (3e), finale.
+ * Terrain 2: quart (2), demi-finale (2).
+ * Terrains 3 et 4: quarts (3) et (4).
+ */
+export function playoffCourt(matchId: string): 1 | 2 | 3 | 4 {
+  if (matchId === "QF3") return 3;
+  if (matchId === "QF4") return 4;
+  if (matchId === "QF1" || matchId === "SF1" || matchId === "TP1" || matchId === "F1") {
     return 1;
   }
   return 2;
@@ -36,10 +43,11 @@ export function playoffLocalTimeRangeLabel(matchId: string): string {
   const ranges: Record<string, [string, string]> = {
     QF1: ["15:15", "15:45"],
     QF2: ["15:15", "15:45"],
-    QF3: ["15:45", "16:15"],
-    QF4: ["15:45", "16:15"],
-    SF1: ["16:15", "17:00"],
-    SF2: ["16:15", "17:00"],
+    QF3: ["15:15", "15:45"],
+    QF4: ["15:15", "15:45"],
+    SF1: ["15:45", "16:15"],
+    SF2: ["15:45", "16:15"],
+    TP1: ["16:15", "17:00"],
     F1: ["17:00", "17:45"],
   };
   const [a, b] = ranges[matchId] ?? ["", ""];
@@ -50,10 +58,7 @@ export function playoffSetsLabelFr(matchId: string): string {
   if (matchId.startsWith("QF")) {
     return "1 set";
   }
-  if (matchId.startsWith("SF")) {
-    return "2 sets, 1 set supplémentaire (en cas d'égalité)";
-  }
-  if (matchId === "F1") {
+  if (matchId.startsWith("SF") || matchId === "TP1" || matchId === "F1") {
     return "2 sets, 1 set supplémentaire (en cas d'égalité)";
   }
   return "";
@@ -71,6 +76,8 @@ export function formatPlayoffPhaseDetailFr(match: { id: string; phase: string })
       ? "Quarts de finale"
       : match.phase === "semi"
         ? "Demi-finale"
-        : "Finale";
+        : match.phase === "third"
+          ? "Petite finale (3e place)"
+          : "Finale";
   return `${stage} · ${time} · ${sets}`;
 }
