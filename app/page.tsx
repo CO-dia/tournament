@@ -8,7 +8,16 @@ export default async function Home() {
   const state = await getState();
   const matches = getResolvedMatches(state);
   const standings = getStandings(state);
-  const upcoming = matches.filter((match) => match.homeScore === null || match.awayScore === null).slice(0, 8);
+  const upcoming = matches.filter((match) => match.homeScore === null || match.awayScore === null).slice(0, 24);
+  const bracketMatches = state.matches
+    .filter((m) => m.phase !== "group")
+    .map((m) => ({
+      id: m.id,
+      homeSlot: m.homeSlot,
+      awaySlot: m.awaySlot,
+      homeScore: m.homeScore,
+      awayScore: m.awayScore,
+    }));
 
   return (
     <>
@@ -47,7 +56,7 @@ export default async function Home() {
           </div>
         </section>
 
-        <TeamNextGames slots={state.slots} matches={matches} />
+        <TeamNextGames slots={state.slots} matches={matches} bracketMatches={bracketMatches} />
 
         <section className="space-y-4">
           <h2 className="text-xl font-semibold">Matchs a venir</h2>

@@ -1,3 +1,4 @@
+import { formatPlayoffPhaseDetailFr } from "@/lib/playoff-schedule";
 import { terrainPillClasses } from "@/lib/terrain-styles";
 import { formatMatchTime } from "@/lib/montreal-time";
 
@@ -47,7 +48,9 @@ export function MatchTable({ matches }: { matches: ResolvedMatch[] }) {
                   ? `${match.homeScore} – ${match.awayScore}`
                   : "—"}
               </td>
-              <td className="px-4 py-3 capitalize text-stk-navy/80">{match.phase}</td>
+              <td className="max-w-[22rem] px-4 py-3 text-stk-navy/85">
+                {formatPlayoffPhaseDetailFr(match)}
+              </td>
             </tr>
           ))}
         </tbody>

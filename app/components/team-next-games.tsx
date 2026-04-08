@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 
+import type { BracketMatch } from "@/lib/playoff-bracket-logic";
+import { teamSeesPlayoffResolvedRow } from "@/lib/playoff-bracket-logic";
+import { playoffLocalTimeRangeLabel, playoffSetsLabelFr } from "@/lib/playoff-schedule";
 import { terrainPillClasses } from "@/lib/terrain-styles";
 import { formatMatchTime } from "@/lib/montreal-time";
 
@@ -12,6 +15,7 @@ type TeamOption = {
 
 type ResolvedMatch = {
   id: string;
+  phase: string;
   startsAt: string;
   court: number;
   homeSlot: number;
@@ -22,16 +26,27 @@ type ResolvedMatch = {
   awayScore: number | null;
 };
 
-export function TeamNextGames({ slots, matches }: { slots: TeamOption[]; matches: ResolvedMatch[] }) {
+export function TeamNextGames({
+  slots,
+  matches,
+  bracketMatches,
+}: {
+  slots: TeamOption[];
+  matches: ResolvedMatch[];
+  bracketMatches: BracketMatch[];
+}) {
   const [selectedSlot, setSelectedSlot] = useState(slots[0]?.slot ?? 1);
 
   const teamMatches = matches
-    .filter(
-      (match) => match.homeSlot === selectedSlot || match.awaySlot === selectedSlot,
-    )
+    .filter((match) => {
+      if (match.phase === "group") {
+        return match.homeSlot === selectedSlot || match.awaySlot === selectedSlot;
+      }
+      return teamSeesPlayoffResolvedRow(selectedSlot, match, bracketMatches);
+    })
     .sort((a, b) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime())
     .filter((match) => match.homeScore === null || match.awayScore === null)
-    .slice(0, 6);
+    .slice(0, 12);
 
   return (
     <section className="space-y-4 rounded-2xl border border-stk-navy/10 bg-white/80 p-5 shadow-md shadow-stk-navy/[0.05] backdrop-blur-sm">
@@ -60,20 +75,30 @@ export function TeamNextGames({ slots, matches }: { slots: TeamOption[]; matches
         <p className="rounded-xl bg-stk-sage/25 px-4 py-3 text-sm text-stk-navy/75">Aucun match a venir pour cette equipe.</p>
       ) : (
         <ul className="space-y-2">
-          {teamMatches.map((match) => (
-            <li
-              key={match.id}
-              className="rounded-xl border border-stk-navy/8 bg-gradient-to-r from-stk-sky/35 to-white px-4 py-3 text-sm text-stk-navy"
-            >
-              <span className="font-semibold text-stk-navy">{formatMatchTime(match.startsAt)}</span>
-              <span className="text-stk-navy/45"> · </span>
-              <span className={`rounded-md px-1.5 py-0.5 text-xs font-medium ${terrainPillClasses(match.court)}`}>
-                Terrain {match.court}
-              </span>
-              <span className="text-stk-navy/45"> · </span>
-              {match.homeTeam} vs {match.awayTeam}
-            </li>
-          ))}
+          {teamMatches.map((match) => {
+            const isPlayoff = match.phase !== "group";
+            const timeLine = isPlayoff ? playoffLocalTimeRangeLabel(match.id) : formatMatchTime(match.startsAt);
+            const setsLine = isPlayoff ? playoffSetsLabelFr(match.id) : null;
+
+            return (
+              <li
+                key={match.id}
+                className="rounded-xl border border-stk-navy/8 bg-gradient-to-r from-stk-sky/35 to-white px-4 py-3 text-sm text-stk-navy"
+              >
+                <div className="font-semibold text-stk-navy">{timeLine}</div>
+                {setsLine ? <div className="mt-0.5 text-xs text-stk-navy/70">{setsLine}</div> : null}
+                <div className="mt-1.5 flex flex-wrap items-center gap-x-1.5 gap-y-1">
+                  <span className={`rounded-md px-1.5 py-0.5 text-xs font-medium ${terrainPillClasses(match.court)}`}>
+                    Terrain {match.court}
+                  </span>
+                  <span className="text-stk-navy/45">·</span>
+                  <span>
+                    {match.homeTeam} vs {match.awayTeam}
+                  </span>
+                </div>
+              </li>
+            );
+          })}
         </ul>
       )}
     </section>

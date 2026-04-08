@@ -3,6 +3,13 @@ import path from "node:path";
 
 import teamsFile from "@/data/teams.json";
 
+import type { PlayoffAfficheRow } from "./playoff-affiche-shared";
+import { matchWinnerSlot } from "./playoff-bracket-logic";
+import { playoffCourt, playoffMatchStartIso } from "./playoff-schedule";
+
+export type { PlayoffAfficheRow } from "./playoff-affiche-shared";
+export { isPlayoffScoreRowEditable } from "./playoff-affiche-shared";
+
 export type TeamSlot = {
   slot: number;
   assignedName: string | null;
@@ -203,10 +210,15 @@ function buildOfficialMatches(): Match[] {
   return matches;
 }
 
+function getGroupMatches(matches: Match[]) {
+  return matches.filter((match) => match.phase === "group");
+}
+
 function hasOfficialSchedule(matches: Match[]) {
+  const group = getGroupMatches(matches);
   const official = buildOfficialMatches();
-  if (matches.length !== official.length) return false;
-  return matches.every((match, index) => {
+  if (group.length !== official.length) return false;
+  return group.every((match, index) => {
     const expected = official[index];
     return (
       match.id === expected.id &&
@@ -345,13 +357,15 @@ export async function getState(): Promise<TournamentState> {
         awayScore: old.awayScore,
       };
     });
+    const preservedPlayoff = parsed.matches.filter((m) => m.phase !== "group");
     const migrated: TournamentState = {
       ...parsed,
-      matches: merged,
+      matches: [...merged, ...preservedPlayoff],
       scoreHistory: priorHistory,
     };
-    await writeStateString(JSON.stringify(migrated, null, 2));
-    return migrated;
+    const synced = syncPlayoffMatchesToState(migrated);
+    await writeStateString(JSON.stringify(synced, null, 2));
+    return synced;
   }
 
   if (parsed.scoreHistory === undefined || parsed.scoreHistory === null) {
@@ -360,6 +374,12 @@ export async function getState(): Promise<TournamentState> {
       scoreHistory: backfillScoreHistory(parsed.matches),
     };
     await writeStateString(JSON.stringify(parsed, null, 2));
+  }
+
+  const synced = syncPlayoffMatchesToState(parsed);
+  if (synced !== parsed) {
+    await writeStateString(JSON.stringify(synced, null, 2));
+    return synced;
   }
 
   return parsed;
@@ -445,6 +465,7 @@ export function getStandings(state: TournamentState): StandingsRow[] {
   }));
 
   for (const match of state.matches) {
+    if (match.phase !== "group") continue;
     if (match.homeScore === null || match.awayScore === null) continue;
 
     const homeScore = Number(match.homeScore);
@@ -496,21 +517,6 @@ const PLAYOFF_QF_RANK_LABELS: [number, number][] = [
   [3, 6],
 ];
 
-export type PlayoffAfficheRow = {
-  matchId: string;
-  homeTeam: string;
-  awayTeam: string;
-  homeScore: number | null;
-  awayScore: number | null;
-  refereeTeam: string | null;
-};
-
-function matchWinnerSlot(m: Match): number | null {
-  if (m.homeScore === null || m.awayScore === null) return null;
-  if (m.homeScore === m.awayScore) return null;
-  return m.homeScore > m.awayScore ? m.homeSlot : m.awaySlot;
-}
-
 function orderSlotsByStandings(
   standings: StandingsRow[],
   slotA: number,
@@ -521,6 +527,118 @@ function orderSlotsByStandings(
   if (ia === -1) return [slotB, slotA];
   if (ib === -1) return [slotA, slotB];
   return ia <= ib ? [slotA, slotB] : [slotB, slotA];
+}
+
+/**
+ * Ensures QF/SF/F match rows exist with slots aligned to the bracket, preserving scores.
+ * Playoff matches must not affect the saison classement — see `getStandings`.
+ */
+function syncPlayoffMatchesToState(state: TournamentState): TournamentState {
+  const groupMatches = getGroupMatches(state.matches);
+  const playoffById = new Map(
+    state.matches.filter((m) => m.phase !== "group").map((m) => [m.id, m]),
+  );
+  const standings = getStandings(state);
+  const top8 = standings.slice(0, 8);
+
+  const qfBuilt: Match[] = [];
+  for (let qi = 0; qi < 4; qi++) {
+    const [i, j] = PLAYOFF_QF_PAIR_INDICES[qi]!;
+    const rowA = top8[i];
+    const rowB = top8[j];
+    const old = playoffById.get(`QF${qi + 1}`);
+    let homeSlot = rowA?.slot ?? 1;
+    let awaySlot = rowB?.slot ?? 2;
+    if (old && (old.homeScore !== null || old.awayScore !== null)) {
+      homeSlot = old.homeSlot;
+      awaySlot = old.awaySlot;
+    }
+    const qid = `QF${qi + 1}` as const;
+    qfBuilt.push({
+      id: qid,
+      phase: "quarter",
+      startsAt: playoffMatchStartIso(qid),
+      court: playoffCourt(qid),
+      homeSlot,
+      awaySlot,
+      refereeSlot: old?.refereeSlot,
+      homeScore: old?.homeScore ?? null,
+      awayScore: old?.awayScore ?? null,
+    });
+  }
+
+  const qfById = new Map(qfBuilt.map((m) => [m.id, m]));
+  const sfBuilt: Match[] = [];
+
+  for (let si = 0; si < 2; si++) {
+    const qfa = qfById.get(`QF${si * 2 + 1}`);
+    const qfb = qfById.get(`QF${si * 2 + 2}`);
+    const w1 = qfa ? matchWinnerSlot(qfa) : null;
+    const w2 = qfb ? matchWinnerSlot(qfb) : null;
+    const old = playoffById.get(`SF${si + 1}`);
+
+    if (w1 !== null && w2 !== null) {
+      const [hs, as] = orderSlotsByStandings(standings, w1, w2);
+      let homeSlot = hs;
+      let awaySlot = as;
+      if (old && (old.homeScore !== null || old.awayScore !== null)) {
+        homeSlot = old.homeSlot;
+        awaySlot = old.awaySlot;
+      }
+      const sid = `SF${si + 1}` as const;
+      sfBuilt.push({
+        id: sid,
+        phase: "semi",
+        startsAt: playoffMatchStartIso(sid),
+        court: playoffCourt(sid),
+        homeSlot,
+        awaySlot,
+        refereeSlot: old?.refereeSlot,
+        homeScore: old?.homeScore ?? null,
+        awayScore: old?.awayScore ?? null,
+      });
+    } else if (old && old.homeScore !== null && old.awayScore !== null) {
+      sfBuilt.push({ ...old, court: playoffCourt(old.id) });
+    }
+  }
+
+  const sfById = new Map(sfBuilt.map((m) => [m.id, m]));
+  const sf1 = sfById.get("SF1");
+  const sf2 = sfById.get("SF2");
+  const sf1w = sf1 ? matchWinnerSlot(sf1) : null;
+  const sf2w = sf2 ? matchWinnerSlot(sf2) : null;
+  const oldFinal = playoffById.get("F1");
+  let finalBuilt: Match | null = null;
+
+  if (sf1w !== null && sf2w !== null) {
+    const [hs, as] = orderSlotsByStandings(standings, sf1w, sf2w);
+    let homeSlot = hs;
+    let awaySlot = as;
+    if (oldFinal && (oldFinal.homeScore !== null || oldFinal.awayScore !== null)) {
+      homeSlot = oldFinal.homeSlot;
+      awaySlot = oldFinal.awaySlot;
+    }
+    finalBuilt = {
+      id: "F1",
+      phase: "final",
+      startsAt: playoffMatchStartIso("F1"),
+      court: playoffCourt("F1"),
+      homeSlot,
+      awaySlot,
+      refereeSlot: oldFinal?.refereeSlot,
+      homeScore: oldFinal?.homeScore ?? null,
+      awayScore: oldFinal?.awayScore ?? null,
+    };
+  } else if (oldFinal && oldFinal.homeScore !== null && oldFinal.awayScore !== null) {
+    finalBuilt = { ...oldFinal, court: playoffCourt("F1") };
+  }
+
+  const playoffNext = [...qfBuilt, ...sfBuilt, ...(finalBuilt ? [finalBuilt] : [])];
+  const nextMatches = [...groupMatches, ...playoffNext];
+  if (JSON.stringify(state.matches) === JSON.stringify(nextMatches)) {
+    return state;
+  }
+  return { ...state, matches: nextMatches };
 }
 
 function alignMatchScores(
@@ -701,18 +819,39 @@ export function getPlayoffAfficheRows(
 }
 
 export function getResolvedMatches(state: TournamentState) {
-  return state.matches
-    .map((match) => ({
-      ...match,
-      homeTeam: getTeamName(state.slots, match.homeSlot),
-      awayTeam: getTeamName(state.slots, match.awaySlot),
-      refereeTeam: match.refereeSlot
-        ? getTeamName(state.slots, match.refereeSlot)
-        : null,
-    }))
-    .sort(
-      (a, b) =>
-        new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime() ||
-        a.court - b.court,
-    );
+  const fromState = state.matches.map((match) => ({
+    ...match,
+    homeTeam: getTeamName(state.slots, match.homeSlot),
+    awayTeam: getTeamName(state.slots, match.awaySlot),
+    refereeTeam: match.refereeSlot ? getTeamName(state.slots, match.refereeSlot) : null,
+  }));
+
+  const byId = new Map(fromState.map((m) => [m.id, m]));
+  const afficheById = new Map(getPlayoffAfficheRows(state).map((r) => [r.matchId, r]));
+
+  const extras: typeof fromState = [];
+  for (const id of ["SF1", "SF2", "F1"] as const) {
+    if (byId.has(id)) continue;
+    const row = afficheById.get(id);
+    if (!row) continue;
+    extras.push({
+      id,
+      phase: id === "F1" ? "final" : "semi",
+      startsAt: playoffMatchStartIso(id),
+      court: playoffCourt(id),
+      homeSlot: -1,
+      awaySlot: -1,
+      refereeSlot: undefined,
+      homeScore: row.homeScore,
+      awayScore: row.awayScore,
+      homeTeam: row.homeTeam,
+      awayTeam: row.awayTeam,
+      refereeTeam: row.refereeTeam,
+    });
+  }
+
+  return [...fromState, ...extras].sort(
+    (a, b) =>
+      new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime() || a.court - b.court,
+  );
 }

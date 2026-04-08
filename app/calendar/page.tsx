@@ -1,8 +1,10 @@
 import { CalendarMatchCell } from "@/app/components/calendar-match-cell";
 import { MainNav } from "@/app/components/nav";
+import { PlayoffAfficheCell } from "@/app/components/playoff-affiche-cell";
 import type { QuickScoreMatch } from "@/app/components/standings-quick-score";
 import { isAdminAuthenticated } from "@/lib/auth";
-import type { PlayoffAfficheRow } from "@/lib/tournament";
+import { playoffCourt, playoffLocalTimeRangeLabel, playoffSetsLabelFr } from "@/lib/playoff-schedule";
+import { terrainPillClasses } from "@/lib/terrain-styles";
 import {
   getPlayoffAfficheRows,
   getResolvedMatches,
@@ -44,31 +46,6 @@ function toQuickScoreMatch(m: Resolved | undefined): QuickScoreMatch | null {
     homeScore: m.homeScore,
     awayScore: m.awayScore,
   };
-}
-
-function PlayoffAfficheCell({ row }: { row: PlayoffAfficheRow }) {
-  const scored =
-    row.homeScore !== null &&
-    row.awayScore !== null &&
-    Number.isFinite(row.homeScore) &&
-    Number.isFinite(row.awayScore);
-
-  return (
-    <div className="flex min-h-[4.5rem] flex-col justify-center gap-2">
-      <p className="text-[0.95rem] font-medium leading-snug text-stk-navy">
-        {row.homeTeam} <span className="font-normal text-stk-navy/45">vs</span> {row.awayTeam}
-      </p>
-      {scored ? (
-        <p className="inline-flex items-baseline gap-2.5 tabular-nums text-lg font-bold tracking-tight text-stk-navy sm:text-xl">
-          <span>{row.homeScore}</span>
-          <span className="text-base font-normal text-stk-navy/35">–</span>
-          <span>{row.awayScore}</span>
-        </p>
-      ) : (
-        <p className="text-xs font-medium uppercase tracking-wide text-stk-navy/45">A venir</p>
-      )}
-    </div>
-  );
 }
 
 export default async function CalendarPage() {
@@ -174,11 +151,14 @@ export default async function CalendarPage() {
             scores des rounds precedents ne sont pas saisis.
           </p>
           <div className="overflow-x-auto rounded-2xl border border-stk-navy/10 bg-white/90 shadow-md shadow-stk-navy/[0.06] backdrop-blur-sm">
-            <table className="w-full min-w-[56rem] border-collapse text-base">
+            <table className="w-full min-w-[62rem] border-collapse text-base">
               <thead className="text-left text-stk-navy">
                 <tr className="bg-stk-navy/[0.07]">
                   <th className="whitespace-nowrap px-4 py-4 text-sm font-semibold sm:px-5 sm:py-4 sm:text-base">
                     Etape
+                  </th>
+                  <th className="whitespace-nowrap px-4 py-4 text-sm font-semibold sm:px-5 sm:py-4 sm:text-base">
+                    Terrain
                   </th>
                   <th className="bg-stk-accent/15 px-4 py-4 text-sm font-semibold sm:px-5 sm:py-4 sm:text-base">
                     Affiche
@@ -194,13 +174,24 @@ export default async function CalendarPage() {
               <tbody className="divide-y divide-stk-navy/[0.06]">
                 {playoffsTemplate.map((row) => {
                   const affiche = playoffAfficheById.get(row.matchId)!;
+                  const court = playoffCourt(row.matchId);
                   return (
                     <tr key={row.stage} className="hover:bg-stk-sky/20">
-                      <td className="whitespace-nowrap px-4 py-4 align-top font-semibold text-stk-navy sm:px-5 sm:py-5">
-                        {row.stage}
+                      <td className="px-4 py-4 align-top font-semibold text-stk-navy sm:px-5 sm:py-5">
+                        <span className="block whitespace-nowrap">{row.stage}</span>
+                        <span className="mt-1 block text-sm font-normal leading-snug text-stk-navy/70">
+                          {playoffLocalTimeRangeLabel(row.matchId)} · {playoffSetsLabelFr(row.matchId)}
+                        </span>
+                      </td>
+                      <td className="px-4 py-4 align-top sm:px-5 sm:py-5">
+                        <span
+                          className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${terrainPillClasses(court)}`}
+                        >
+                          Terrain {court}
+                        </span>
                       </td>
                       <td className="bg-stk-accent/10 px-4 py-4 align-top sm:px-5 sm:py-5">
-                        <PlayoffAfficheCell row={affiche} />
+                        <PlayoffAfficheCell row={affiche} isAdmin={isAdmin} />
                       </td>
                       <td className="bg-stk-accent/10 px-4 py-4 align-top text-stk-navy/85 sm:px-5 sm:py-5">
                         {affiche.refereeTeam ?? "—"}
