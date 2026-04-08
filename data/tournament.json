@@ -221,7 +221,7 @@
       "court": 2,
       "homeSlot": 5,
       "awaySlot": 8,
-      "refereeSlot": 2,
+      "refereeSlot": 3,
       "homeScore": 17,
       "awayScore": 25
     },
@@ -230,9 +230,9 @@
       "phase": "group",
       "startsAt": "2026-04-11T16:45:00.000Z",
       "court": 3,
-      "homeSlot": 1,
-      "awaySlot": 5,
-      "refereeSlot": 3,
+      "homeSlot": 6,
+      "awaySlot": 7,
+      "refereeSlot": 9,
       "homeScore": 19,
       "awayScore": 25
     },
@@ -263,9 +263,9 @@
       "phase": "group",
       "startsAt": "2026-04-11T17:45:00.000Z",
       "court": 1,
-      "homeSlot": 6,
-      "awaySlot": 7,
-      "refereeSlot": 5,
+      "homeSlot": 1,
+      "awaySlot": 5,
+      "refereeSlot": 7,
       "homeScore": 24,
       "awayScore": 25
     },
@@ -287,7 +287,7 @@
       "court": 1,
       "homeSlot": 7,
       "awaySlot": 9,
-      "refereeSlot": 1,
+      "refereeSlot": 6,
       "homeScore": 25,
       "awayScore": 22
     },

@@ -35,6 +35,10 @@ function formatTimeRange(time: string) {
   return `${String(startHours).padStart(2, "0")}:${String(startMins).padStart(2, "0")}-${String(endHours).padStart(2, "0")}:${String(endMins).padStart(2, "0")}`;
 }
 
+function formatRoundLabel(roundIndex: number) {
+  return `#${roundIndex}`;
+}
+
 type Resolved = ReturnType<typeof getResolvedMatches>[number];
 
 function toQuickScoreMatch(m: Resolved | undefined): QuickScoreMatch | null {
@@ -72,9 +76,12 @@ export default async function CalendarPage() {
         <section className="space-y-4">
           <h2 className="text-xl font-semibold sm:text-2xl">Saison</h2>
           <div className="overflow-x-auto rounded-2xl border border-stk-navy/10 bg-white/90 shadow-md shadow-stk-navy/[0.06] backdrop-blur-sm">
-            <table className="w-full min-w-[76rem] border-collapse text-base">
+            <table className="w-full min-w-[84rem] border-collapse text-base">
               <thead className="text-left text-stk-navy">
                 <tr className="bg-stk-navy/[0.07]">
+                  <th className="whitespace-nowrap px-4 py-4 text-sm font-semibold sm:px-5 sm:py-4 sm:text-base">
+                    Round
+                  </th>
                   <th className="whitespace-nowrap px-4 py-4 text-sm font-semibold sm:px-5 sm:py-4 sm:text-base">
                     Horaire
                   </th>
@@ -102,7 +109,7 @@ export default async function CalendarPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-stk-navy/[0.06]">
-                {officialSeasonRows.map((row) => {
+                {officialSeasonRows.map((row, index) => {
                   const startsAt = timeToStartsAtIso(row.time);
                   const match1 = byTimeAndCourt.get(`${startsAt}-1`);
                   const match2 = byTimeAndCourt.get(`${startsAt}-2`);
@@ -110,6 +117,9 @@ export default async function CalendarPage() {
 
                   return (
                     <tr key={row.time} className="hover:bg-stk-sky/20">
+                      <td className="whitespace-nowrap px-4 py-4 align-top font-semibold text-stk-navy sm:px-5 sm:py-5">
+                        {formatRoundLabel(index + 1)}
+                      </td>
                       <td className="whitespace-nowrap px-4 py-4 align-top font-semibold sm:px-5 sm:py-5">
                         {formatTimeRange(row.time)}
                       </td>
