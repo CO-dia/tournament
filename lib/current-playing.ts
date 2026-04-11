@@ -1,5 +1,10 @@
 import { playoffMatchEndIso } from "@/lib/playoff-schedule";
-import { getResolvedMatches, type TournamentState } from "@/lib/tournament";
+import {
+  buildEffectiveStartToRoundIndex,
+  getEffectiveGroupEndIso,
+  getResolvedMatches,
+  type TournamentState,
+} from "@/lib/tournament";
 
 type Resolved = ReturnType<typeof getResolvedMatches>[number];
 
@@ -7,11 +12,16 @@ function matchFullyScored(m: Resolved): boolean {
   return m.homeScore !== null && m.awayScore !== null;
 }
 
-function slotEndMs(matchesInSlot: Resolved[]): number {
+function slotEndMs(matchesInSlot: Resolved[], state: TournamentState): number {
   const first = matchesInSlot[0];
   if (!first) return 0;
   const allGroup = matchesInSlot.every((m) => m.phase === "group");
   if (allGroup) {
+    const roundMap = buildEffectiveStartToRoundIndex(state);
+    const roundIndex = roundMap.get(first.startsAt);
+    if (roundIndex !== undefined) {
+      return new Date(getEffectiveGroupEndIso(state, roundIndex)).getTime();
+    }
     return new Date(first.startsAt).getTime() + 30 * 60 * 1000;
   }
   return Math.max(
@@ -54,7 +64,7 @@ export function getCurrentPlayingMatches(
       startsAt,
       matches,
       startMs: new Date(startsAt).getTime(),
-      endMs: slotEndMs(matches),
+      endMs: slotEndMs(matches, state),
     }))
     .sort((a, b) => a.startMs - b.startMs);
 

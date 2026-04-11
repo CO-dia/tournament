@@ -40,6 +40,10 @@ export type TournamentState = {
   slots: TeamSlot[];
   matches: Match[];
   scoreHistory?: ScoreHistoryEntry[];
+  /** Overridden start ISO per group round (index 0–9). null entry = use official time. */
+  groupRoundStarts?: (string | null)[];
+  /** Overridden end ISO per group round (index 0–9). null entry = start + 30 min. */
+  groupRoundEnds?: (string | null)[];
 };
 
 type TeamsFile = { teams: { slot: number; name: string }[] };
@@ -223,13 +227,53 @@ function hasOfficialSchedule(matches: Match[]) {
     const expected = official[index];
     return (
       match.id === expected.id &&
-      match.startsAt === expected.startsAt &&
+      // startsAt intentionally excluded — admin may override round times
       match.court === expected.court &&
       match.homeSlot === expected.homeSlot &&
       match.awaySlot === expected.awaySlot &&
       match.refereeSlot === expected.refereeSlot
     );
   });
+}
+
+/** Map from group match id ("S1"…"S28") to its round index (0–9). */
+function buildMatchToRoundIndex(): Map<string, number> {
+  const map = new Map<string, number>();
+  let idx = 1;
+  for (let roundIndex = 0; roundIndex < officialSeasonRows.length; roundIndex++) {
+    const row = officialSeasonRows[roundIndex]!;
+    for (const pairing of [row.court1, row.court2, row.court3]) {
+      if (!pairing) continue;
+      map.set(`S${idx}`, roundIndex);
+      idx++;
+    }
+  }
+  return map;
+}
+
+/** Effective start ISO for a group round — uses override if set, otherwise official. */
+export function getEffectiveGroupStartIso(state: TournamentState, roundIndex: number): string {
+  return (
+    state.groupRoundStarts?.[roundIndex] ??
+    timeToStartsAtIso(officialSeasonRows[roundIndex]!.time)
+  );
+}
+
+/** Effective end ISO for a group round — uses override if set, otherwise start + 30 min. */
+export function getEffectiveGroupEndIso(state: TournamentState, roundIndex: number): string {
+  const overriddenEnd = state.groupRoundEnds?.[roundIndex];
+  if (overriddenEnd) return overriddenEnd;
+  const start = getEffectiveGroupStartIso(state, roundIndex);
+  return new Date(new Date(start).getTime() + 30 * 60 * 1000).toISOString();
+}
+
+/** Map from effective start ISO to round index, for the current state. */
+export function buildEffectiveStartToRoundIndex(state: TournamentState): Map<string, number> {
+  const map = new Map<string, number>();
+  for (let i = 0; i < officialSeasonRows.length; i++) {
+    map.set(getEffectiveGroupStartIso(state, i), i);
+  }
+  return map;
 }
 
 const defaultState: TournamentState = {
@@ -349,11 +393,18 @@ export async function getState(): Promise<TournamentState> {
         ? parsed.scoreHistory
         : backfillScoreHistory(parsed.matches);
     const byId = new Map(parsed.matches.map((m) => [m.id, m]));
+    const matchToRound = buildMatchToRoundIndex();
     const merged = buildOfficialMatches().map((om) => {
       const old = byId.get(om.id);
-      if (!old) return om;
+      if (!old) {
+        // Apply any stored override
+        const roundIdx = matchToRound.get(om.id);
+        const overriddenStart = roundIdx !== undefined ? parsed.groupRoundStarts?.[roundIdx] : undefined;
+        return overriddenStart ? { ...om, startsAt: overriddenStart } : om;
+      }
       return {
         ...om,
+        startsAt: old.startsAt, // preserve any time override already applied to the match
         homeScore: old.homeScore,
         awayScore: old.awayScore,
       };
@@ -440,6 +491,83 @@ export async function clearAllScores() {
     awayScore: null,
   }));
   await setState({ ...state, matches, scoreHistory: [] });
+}
+
+/**
+ * Override the start (and optionally end) time of a group round.
+ * All subsequent rounds are shifted by the same delta as the start-time change.
+ * `newStartLocalTime` and `newEndLocalTime` are wall-clock strings "HH:MM" in Montréal time.
+ */
+export async function updateSectionTime(
+  roundIndex: number,
+  newStartLocalTime: string,
+  newEndLocalTime?: string,
+) {
+  if (roundIndex < 0 || roundIndex >= officialSeasonRows.length) {
+    throw new Error(`Invalid round index: ${roundIndex}`);
+  }
+
+  const state = await getState();
+  const newStartIso = timeToStartsAtIso(newStartLocalTime);
+  const newEndIso = newEndLocalTime ? timeToStartsAtIso(newEndLocalTime) : undefined;
+
+  const currentStartIso = getEffectiveGroupStartIso(state, roundIndex);
+  const deltaMs = new Date(newStartIso).getTime() - new Date(currentStartIso).getTime();
+
+  const n = officialSeasonRows.length;
+  const groupRoundStarts: (string | null)[] = Array.from(
+    { length: n },
+    (_, i) => state.groupRoundStarts?.[i] ?? null,
+  );
+  const groupRoundEnds: (string | null)[] = Array.from(
+    { length: n },
+    (_, i) => state.groupRoundEnds?.[i] ?? null,
+  );
+
+  for (let i = roundIndex; i < n; i++) {
+    const currentStart = getEffectiveGroupStartIso(state, i);
+    groupRoundStarts[i] =
+      i === roundIndex
+        ? newStartIso
+        : new Date(new Date(currentStart).getTime() + deltaMs).toISOString();
+
+    if (i === roundIndex && newEndIso) {
+      groupRoundEnds[i] = newEndIso;
+    } else {
+      const currentEnd = groupRoundEnds[i];
+      if (currentEnd !== null) {
+        groupRoundEnds[i] = new Date(new Date(currentEnd).getTime() + deltaMs).toISOString();
+      }
+    }
+  }
+
+  const matchToRound = buildMatchToRoundIndex();
+  const updatedMatches = state.matches.map((match) => {
+    if (match.phase !== "group") return match;
+    const rIdx = matchToRound.get(match.id);
+    if (rIdx === undefined || rIdx < roundIndex) return match;
+    return { ...match, startsAt: groupRoundStarts[rIdx]! };
+  });
+
+  await setState({ ...state, matches: updatedMatches, groupRoundStarts, groupRoundEnds });
+}
+
+/** Reset all group round times back to the official schedule. */
+export async function resetSectionTimes() {
+  const state = await getState();
+  const officialMatches = buildOfficialMatches();
+  const officialById = new Map(officialMatches.map((m) => [m.id, m]));
+  const updatedMatches = state.matches.map((match) => {
+    if (match.phase !== "group") return match;
+    const official = officialById.get(match.id);
+    return official ? { ...match, startsAt: official.startsAt } : match;
+  });
+  await setState({
+    ...state,
+    matches: updatedMatches,
+    groupRoundStarts: undefined,
+    groupRoundEnds: undefined,
+  });
 }
 
 export function getTeamName(slots: TeamSlot[], slotNumber: number) {

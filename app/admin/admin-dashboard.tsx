@@ -3,6 +3,14 @@
 import { useMemo, useState } from "react";
 import type { Match, TeamSlot } from "@/lib/tournament";
 
+type RoundTimeInfo = {
+  roundIndex: number;
+  officialLocalTime: string;
+  effectiveStartLocalTime: string;
+  effectiveEndLocalTime: string;
+  isOverridden: boolean;
+};
+
 type AdminDashboardProps = {
   slots: TeamSlot[];
   officialTeamNames: string[];
@@ -13,6 +21,7 @@ type AdminDashboardProps = {
       refereeTeam: string | null;
     }
   >;
+  roundTimes: RoundTimeInfo[];
 };
 
 type Message = {
@@ -47,6 +56,7 @@ export function AdminDashboard({
   slots,
   officialTeamNames,
   matches,
+  roundTimes,
 }: AdminDashboardProps) {
   const [assignments, setAssignments] = useState<Record<number, string>>(
     Object.fromEntries(
@@ -60,6 +70,67 @@ export function AdminDashboard({
   const [pending, setPending] = useState(false);
   const [clearModalOpen, setClearModalOpen] = useState(false);
   const [clearPending, setClearPending] = useState(false);
+
+  // Round-time editor state
+  const [editingRound, setEditingRound] = useState<number | null>(null);
+  const [editStartTime, setEditStartTime] = useState("");
+  const [editEndTime, setEditEndTime] = useState("");
+  const [rescheduleMessage, setRescheduleMessage] = useState<Message | null>(null);
+  const [reschedulePending, setReschedulePending] = useState(false);
+  const [resetConfirmOpen, setResetConfirmOpen] = useState(false);
+
+  const hasAnyOverride = roundTimes.some((r) => r.isOverridden);
+
+  function openRoundEditor(round: RoundTimeInfo) {
+    setEditingRound(round.roundIndex);
+    setEditStartTime(round.effectiveStartLocalTime);
+    setEditEndTime(round.effectiveEndLocalTime);
+    setRescheduleMessage(null);
+  }
+
+  async function applyRoundTime() {
+    if (editingRound === null) return;
+    setReschedulePending(true);
+    setRescheduleMessage(null);
+    try {
+      const response = await fetch("/api/admin/reschedule", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          roundIndex: editingRound,
+          newStartTime: editStartTime,
+          newEndTime: editEndTime,
+        }),
+      });
+      if (!response.ok) throw new Error("Echec");
+      setRescheduleMessage({ type: "success", text: "Horaire mis a jour." });
+      setEditingRound(null);
+      window.location.reload();
+    } catch {
+      setRescheduleMessage({ type: "error", text: "Echec de la mise a jour." });
+    } finally {
+      setReschedulePending(false);
+    }
+  }
+
+  async function resetAllTimes() {
+    setReschedulePending(true);
+    setRescheduleMessage(null);
+    try {
+      const response = await fetch("/api/admin/reschedule", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reset: true }),
+      });
+      if (!response.ok) throw new Error("Echec");
+      setResetConfirmOpen(false);
+      window.location.reload();
+    } catch {
+      setRescheduleMessage({ type: "error", text: "Echec de la reinitialisation." });
+    } finally {
+      setReschedulePending(false);
+    }
+  }
 
   const selectedMatch = useMemo(
     () => matches.find((match) => match.id === selectedMatchId),
@@ -309,6 +380,136 @@ export function AdminDashboard({
         </div>
       </section>
 
+      <section className={sectionClass}>
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="min-w-0">
+            <h2 className="text-xl font-semibold">Horaire des rounds</h2>
+            <p className="mt-1 text-sm text-stk-navy/70">
+              Modifiez l&apos;heure de debut et de fin d&apos;un round. Tous les rounds suivants seront decales du meme intervalle.
+            </p>
+          </div>
+          {hasAnyOverride ? (
+            <button
+              type="button"
+              onClick={() => setResetConfirmOpen(true)}
+              disabled={reschedulePending}
+              className="shrink-0 rounded-full border border-stk-navy/20 px-4 py-2 text-sm font-medium text-stk-navy transition hover:bg-stk-sky/50 disabled:opacity-60"
+            >
+              Reinitialiser l&apos;horaire officiel
+            </button>
+          ) : null}
+        </div>
+
+        <div className="mt-5 overflow-x-auto rounded-xl border border-stk-navy/10">
+          <table className="w-full min-w-lg border-collapse text-sm">
+            <thead>
+              <tr className="bg-stk-navy/5 text-left text-xs font-semibold uppercase tracking-wide text-stk-navy/60">
+                <th className="px-4 py-3">Round</th>
+                <th className="px-4 py-3">Horaire actuel</th>
+                <th className="px-4 py-3">Horaire officiel</th>
+                <th className="px-4 py-3" />
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-stk-navy/6">
+              {roundTimes.map((round) =>
+                editingRound === round.roundIndex ? (
+                  <tr key={round.roundIndex} className="bg-stk-sky/20">
+                    <td className="px-4 py-3 font-semibold text-stk-navy">
+                      #{round.roundIndex + 1}
+                    </td>
+                    <td colSpan={2} className="px-4 py-3">
+                      <div className="flex flex-wrap items-center gap-3">
+                        <label className="flex items-center gap-2 text-xs font-medium text-stk-navy">
+                          Debut
+                          <input
+                            type="time"
+                            value={editStartTime}
+                            onChange={(e) => setEditStartTime(e.target.value)}
+                            className={inputClass + " w-32"}
+                          />
+                        </label>
+                        <label className="flex items-center gap-2 text-xs font-medium text-stk-navy">
+                          Fin
+                          <input
+                            type="time"
+                            value={editEndTime}
+                            onChange={(e) => setEditEndTime(e.target.value)}
+                            className={inputClass + " w-32"}
+                          />
+                        </label>
+                        <span className="text-xs text-stk-navy/55">
+                          Les rounds #{round.roundIndex + 2}–#10 seront decales du meme ecart
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={applyRoundTime}
+                          disabled={reschedulePending}
+                          className="rounded-full bg-stk-accent px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-stk-accent/90 disabled:opacity-60"
+                        >
+                          Appliquer
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setEditingRound(null)}
+                          disabled={reschedulePending}
+                          className="rounded-full border border-stk-navy/20 px-3 py-1.5 text-xs font-medium text-stk-navy transition hover:bg-stk-sky/50 disabled:opacity-60"
+                        >
+                          Annuler
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ) : (
+                  <tr key={round.roundIndex} className="hover:bg-stk-sky/10">
+                    <td className="px-4 py-3 font-semibold text-stk-navy">
+                      #{round.roundIndex + 1}
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className={round.isOverridden ? "font-medium text-stk-accent" : "text-stk-navy"}>
+                        {round.effectiveStartLocalTime}–{round.effectiveEndLocalTime}
+                      </span>
+                      {round.isOverridden ? (
+                        <span className="ml-2 inline-flex items-center rounded-full bg-stk-accent/15 px-2 py-0.5 text-xs font-medium text-stk-accent">
+                          modifie
+                        </span>
+                      ) : null}
+                    </td>
+                    <td className="px-4 py-3 text-stk-navy/50">
+                      {round.officialLocalTime}
+                    </td>
+                    <td className="px-4 py-3">
+                      <button
+                        type="button"
+                        onClick={() => openRoundEditor(round)}
+                        className="rounded-full border border-stk-navy/20 px-3 py-1.5 text-xs font-medium text-stk-navy transition hover:bg-stk-sky/50"
+                      >
+                        Modifier
+                      </button>
+                    </td>
+                  </tr>
+                ),
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {rescheduleMessage ? (
+          <p
+            className={`mt-4 rounded-xl px-4 py-3 text-sm font-medium ${
+              rescheduleMessage.type === "success"
+                ? "border border-stk-sage/50 bg-stk-sage/35 text-stk-navy"
+                : "border border-stk-accent/40 bg-stk-accent/15 text-stk-navy"
+            }`}
+          >
+            {rescheduleMessage.text}
+          </p>
+        ) : null}
+      </section>
+
       {message ? (
         <p
           className={`rounded-xl px-4 py-3 text-sm font-medium ${
@@ -328,6 +529,50 @@ export function AdminDashboard({
       >
         Se deconnecter
       </button>
+
+      {resetConfirmOpen ? (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-stk-navy/50 p-4 backdrop-blur-[2px]"
+          role="presentation"
+          onClick={() => !reschedulePending && setResetConfirmOpen(false)}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="reset-times-dialog-title"
+            className="max-w-md rounded-2xl border border-stk-navy/15 bg-white p-6 shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3
+              id="reset-times-dialog-title"
+              className="text-lg font-semibold text-stk-navy"
+            >
+              Reinitialiser l&apos;horaire ?
+            </h3>
+            <p className="mt-3 text-sm leading-relaxed text-stk-navy/80">
+              Cette action remet tous les rounds a leurs heures officielles. Les scores ne sont pas affectes.
+            </p>
+            <div className="mt-6 flex flex-wrap justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setResetConfirmOpen(false)}
+                disabled={reschedulePending}
+                className="rounded-full border border-stk-navy/20 px-4 py-2 text-sm font-medium text-stk-navy transition hover:bg-stk-sky/50 disabled:opacity-60"
+              >
+                Annuler
+              </button>
+              <button
+                type="button"
+                onClick={resetAllTimes}
+                disabled={reschedulePending}
+                className="rounded-full bg-stk-navy px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-stk-navy/90 disabled:opacity-60"
+              >
+                {reschedulePending ? "Reinitialisation…" : "Oui, reinitialiser"}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       {clearModalOpen ? (
         <div

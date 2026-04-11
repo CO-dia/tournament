@@ -2,7 +2,15 @@ import { isAdminAuthenticated } from "@/lib/auth";
 import { MainNav } from "@/app/components/nav";
 import { AdminDashboard } from "./admin-dashboard";
 import { AdminLogin } from "./admin-login";
-import { getOfficialTeamNames, getResolvedMatches, getState } from "@/lib/tournament";
+import {
+  getEffectiveGroupEndIso,
+  getEffectiveGroupStartIso,
+  getOfficialTeamNames,
+  getResolvedMatches,
+  getState,
+  officialSeasonRows,
+} from "@/lib/tournament";
+import { formatMatchTime } from "@/lib/montreal-time";
 
 export default async function AdminPage() {
   const isAdmin = await isAdminAuthenticated();
@@ -26,6 +34,14 @@ export default async function AdminPage() {
   const state = await getState();
   const matches = getResolvedMatches(state);
 
+  const roundTimes = officialSeasonRows.map((row, index) => ({
+    roundIndex: index,
+    officialLocalTime: row.time,
+    effectiveStartLocalTime: formatMatchTime(getEffectiveGroupStartIso(state, index)),
+    effectiveEndLocalTime: formatMatchTime(getEffectiveGroupEndIso(state, index)),
+    isOverridden: !!(state.groupRoundStarts?.[index]),
+  }));
+
   return (
     <>
       <MainNav />
@@ -39,6 +55,7 @@ export default async function AdminPage() {
           slots={state.slots}
           matches={matches}
           officialTeamNames={getOfficialTeamNames()}
+          roundTimes={roundTimes}
         />
       </main>
     </>

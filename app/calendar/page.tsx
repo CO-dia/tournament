@@ -8,13 +8,15 @@ import { playoffCourt, playoffLocalTimeRangeLabel, playoffSetsLabelFr } from "@/
 import { terrainPillClasses } from "@/lib/terrain-styles";
 import { getCurrentPlayingMatches } from "@/lib/current-playing";
 import {
+  getEffectiveGroupEndIso,
+  getEffectiveGroupStartIso,
   getPlayoffAfficheRows,
   getResolvedMatches,
   getState,
   getTeamName,
   officialSeasonRows,
-  timeToStartsAtIso,
 } from "@/lib/tournament";
+import { EVENT_TIME_ZONE } from "@/lib/montreal-time";
 
 export const revalidate = 120;
 
@@ -33,15 +35,16 @@ const playoffsTemplate = [
   { stage: "Finale", winnerTo: "Champion", matchId: "F1" },
 ] as const;
 
-function formatTimeRange(time: string) {
-  const [hours, minutes] = time.split(":").map(Number);
-  const startMinutes = hours * 60 + minutes;
-  const endMinutes = startMinutes + 30;
-  const startHours = Math.floor(startMinutes / 60);
-  const endHours = Math.floor(endMinutes / 60);
-  const startMins = startMinutes % 60;
-  const endMins = endMinutes % 60;
-  return `${String(startHours).padStart(2, "0")}:${String(startMins).padStart(2, "0")}-${String(endHours).padStart(2, "0")}:${String(endMins).padStart(2, "0")}`;
+function formatIsoTimeRange(startIso: string, endIso: string): string {
+  const opts = {
+    timeZone: EVENT_TIME_ZONE,
+    hour: "2-digit" as const,
+    minute: "2-digit" as const,
+    hour12: false,
+  };
+  const a = new Date(startIso).toLocaleTimeString("sv-SE", opts);
+  const b = new Date(endIso).toLocaleTimeString("sv-SE", opts);
+  return `${a}–${b}`;
 }
 
 function formatRoundLabel(roundIndex: number) {
@@ -129,12 +132,13 @@ export default async function CalendarPage() {
               </thead>
               <tbody className="divide-y divide-stk-navy/[0.06]">
                 {officialSeasonRows.map((row, index) => {
-                  const startsAt = timeToStartsAtIso(row.time);
-                  const match1 = byTimeAndCourt.get(`${startsAt}-1`);
-                  const match2 = byTimeAndCourt.get(`${startsAt}-2`);
-                  const match3 = byTimeAndCourt.get(`${startsAt}-3`);
+                  const effectiveStartIso = getEffectiveGroupStartIso(state, index);
+                  const effectiveEndIso = getEffectiveGroupEndIso(state, index);
+                  const match1 = byTimeAndCourt.get(`${effectiveStartIso}-1`);
+                  const match2 = byTimeAndCourt.get(`${effectiveStartIso}-2`);
+                  const match3 = byTimeAndCourt.get(`${effectiveStartIso}-3`);
                   const isCurrentSeasonRow =
-                    currentStartsAt !== null && currentStartsAt === startsAt;
+                    currentStartsAt !== null && currentStartsAt === effectiveStartIso;
 
                   return (
                     <tr
@@ -147,7 +151,7 @@ export default async function CalendarPage() {
                         {formatRoundLabel(index + 1)}
                       </td>
                       <td className="whitespace-nowrap px-4 py-4 align-top font-semibold sm:px-5 sm:py-5">
-                        {formatTimeRange(row.time)}
+                        {formatIsoTimeRange(effectiveStartIso, effectiveEndIso)}
                       </td>
                       <td className="bg-stk-accent/10 px-4 py-4 align-top sm:px-5 sm:py-5">
                         <CalendarMatchCell isAdmin={isAdmin} match={toQuickScoreMatch(match1)} />
