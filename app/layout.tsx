@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Source_Serif_4 } from "next/font/google";
 
+import { AutoRefresh } from "@/app/components/AutoRefresh";
 import { CornerClock } from "@/app/components/corner-clock";
 import "./globals.css";
 
@@ -40,6 +41,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         {children}
+        <AutoRefresh />
         <CornerClock />
         <footer className="mt-auto border-t border-stk-navy/10 bg-white/50 py-5 text-center text-xs text-stk-navy/55">
           <span className="font-medium text-stk-navy/75">

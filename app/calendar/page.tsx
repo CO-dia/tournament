@@ -1,5 +1,6 @@
 import { CalendarMatchCell } from "@/app/components/calendar-match-cell";
 import { MainNav } from "@/app/components/nav";
+import { RefreshButton } from "@/app/components/refresh-button";
 import { PlayoffAfficheCell } from "@/app/components/playoff-affiche-cell";
 import type { QuickScoreMatch } from "@/app/components/standings-quick-score";
 import { isAdminAuthenticated } from "@/lib/auth";
@@ -15,7 +16,7 @@ import {
   timeToStartsAtIso,
 } from "@/lib/tournament";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 120;
 
 /** Distinct from terrain column tints (accent/sky/sage) so the creneau actuel row reads clearly. */
 const calendarCurrentRowClass =
@@ -76,12 +77,19 @@ export default async function CalendarPage() {
       <MainNav />
       <main className="mx-auto w-full max-w-[min(100%,92rem)] flex-1 space-y-10 px-4 py-8 sm:px-6 lg:px-10">
         <section className="space-y-2 border-b border-stk-navy/10 pb-6">
-          <p className="text-sm font-medium uppercase tracking-wider text-stk-accent">Programme</p>
-          <h1 className="text-3xl font-bold sm:text-4xl">Calendrier</h1>
-          <p className="max-w-3xl text-stk-navy/75">
-            Modele de calendrier de saison (six matchs par equipe), suivi d&apos;un tableau final a elimination directe pour
-            le top 8. Scores affiches des qu&apos;ils sont saisis.
-          </p>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+            <div className="min-w-0 space-y-2">
+              <p className="text-sm font-medium uppercase tracking-wider text-stk-accent">Programme</p>
+              <h1 className="text-3xl font-bold sm:text-4xl">Calendrier</h1>
+              <p className="max-w-3xl text-stk-navy/75">
+                Modele de calendrier de saison (six matchs par equipe), suivi d&apos;un tableau final a elimination directe pour
+                le top 8. Scores affiches des qu&apos;ils sont saisis.
+              </p>
+            </div>
+            <div className="shrink-0">
+              <RefreshButton />
+            </div>
+          </div>
         </section>
 
         <section className="space-y-4">

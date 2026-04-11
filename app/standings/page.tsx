@@ -1,4 +1,7 @@
+export const revalidate = 120;
+
 import { MainNav } from "@/app/components/nav";
+import { RefreshButton } from "@/app/components/refresh-button";
 import { StandingsQuickScore } from "@/app/components/standings-quick-score";
 import { isAdminAuthenticated } from "@/lib/auth";
 import { formatMatchTime } from "@/lib/montreal-time";
@@ -35,7 +38,10 @@ export default async function StandingsPage() {
                 matchs gagnés.
               </p>
             </div>
-            {isAdmin ? <StandingsQuickScore matches={quickScoreMatches} /> : null}
+            <div className="flex shrink-0 items-start gap-2">
+              <RefreshButton />
+              {isAdmin ? <StandingsQuickScore matches={quickScoreMatches} /> : null}
+            </div>
           </div>
         </section>
 

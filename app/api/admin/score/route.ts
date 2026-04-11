@@ -1,3 +1,4 @@
+import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 import { isAdminAuthenticated } from "@/lib/auth";
 import { updateScore } from "@/lib/tournament";
@@ -20,5 +21,7 @@ export async function POST(request: Request) {
   }
 
   await updateScore(body.matchId, Number(body.homeScore), Number(body.awayScore));
+  revalidatePath("/standings");
+  revalidatePath("/calendar");
   return NextResponse.json({ ok: true });
 }
