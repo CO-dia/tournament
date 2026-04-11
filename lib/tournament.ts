@@ -3,6 +3,7 @@ import path from "node:path";
 
 import teamsFile from "@/data/teams.json";
 
+import { backupTournamentStateToDiscord } from "./discord-backup";
 import type { PlayoffAfficheRow } from "./playoff-affiche-shared";
 import { matchLoserSlot, matchWinnerSlot } from "./playoff-bracket-logic";
 import { playoffCourt, playoffMatchStartIso } from "./playoff-schedule";
@@ -386,7 +387,13 @@ export async function getState(): Promise<TournamentState> {
 }
 
 async function setState(next: TournamentState) {
-  await writeStateString(JSON.stringify(next, null, 2));
+  const json = JSON.stringify(next, null, 2);
+  await writeStateString(json);
+  try {
+    await backupTournamentStateToDiscord(json);
+  } catch (err) {
+    console.error("[discord-backup]", err);
+  }
 }
 
 export async function updateDraw(assignments: Record<number, string | null>) {
