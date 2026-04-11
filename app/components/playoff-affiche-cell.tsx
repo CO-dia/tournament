@@ -74,7 +74,7 @@ export function PlayoffAfficheCell({
     <>
       <div className="flex min-h-[4.5rem] flex-col justify-center gap-2">
         <p className="text-[0.95rem] font-medium leading-snug text-stk-navy">
-          {row.homeTeam} <span className="font-normal text-stk-navy/45">vs</span> {row.awayTeam}
+          {row.homeTeam} <span className="font-normal text-stk-navy/65">vs</span> {row.awayTeam}
         </p>
         <div className="flex flex-wrap items-end gap-x-3 gap-y-1">
           {scored ? (
@@ -84,7 +84,7 @@ export function PlayoffAfficheCell({
               <span>{row.awayScore}</span>
             </p>
           ) : (
-            <p className="text-xs font-medium uppercase tracking-wide text-stk-navy/45">A venir</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-stk-navy">A venir</p>
           )}
           {isAdmin && canEdit ? (
             <button

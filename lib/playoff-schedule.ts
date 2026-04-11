@@ -24,6 +24,22 @@ export function playoffMatchStartIso(matchId: string): string {
   return montrealLocalToIso(h, min);
 }
 
+/** End of the scheduled window (exclusive of following slot), same convention as `playoffLocalTimeRangeLabel`. */
+export function playoffMatchEndIso(matchId: string): string {
+  const end: Record<string, [number, number]> = {
+    QF1: [15, 45],
+    QF2: [15, 45],
+    QF3: [15, 45],
+    QF4: [15, 45],
+    SF1: [16, 15],
+    SF2: [16, 15],
+    TP1: [17, 0],
+    F1: [17, 45],
+  };
+  const [h, min] = end[matchId] ?? [15, 45];
+  return montrealLocalToIso(h, min);
+}
+
 /**
  * Terrain 1: quart (1), demi-finale (1), petite finale (3e), finale.
  * Terrain 2: quart (2), demi-finale (2).

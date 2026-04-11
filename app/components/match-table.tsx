@@ -14,7 +14,15 @@ type ResolvedMatch = {
   awayScore: number | null;
 };
 
-export function MatchTable({ matches }: { matches: ResolvedMatch[] }) {
+export function MatchTable({
+  matches,
+  highlightMatchIds,
+}: {
+  matches: ResolvedMatch[];
+  /** Rows whose `id` is in this set get a stronger background (e.g. creneau actuel). */
+  highlightMatchIds?: ReadonlySet<string>;
+}) {
+  const hl = highlightMatchIds ?? null;
   return (
     <div className="overflow-x-auto rounded-2xl border border-stk-navy/10 bg-white/90 shadow-md shadow-stk-navy/[0.06] backdrop-blur-sm">
       <table className="min-w-full text-sm">
@@ -30,7 +38,14 @@ export function MatchTable({ matches }: { matches: ResolvedMatch[] }) {
         </thead>
         <tbody className="divide-y divide-stk-navy/[0.06]">
           {matches.map((match) => (
-            <tr key={match.id} className="transition-colors hover:bg-stk-sky/25">
+            <tr
+              key={match.id}
+              className={`transition-colors hover:bg-stk-sky/25 ${
+                hl?.has(match.id)
+                  ? "bg-stk-accent/12 ring-1 ring-inset ring-stk-accent/35"
+                  : ""
+              }`}
+            >
               <td className="whitespace-nowrap px-4 py-3 text-stk-navy/90">{formatMatchTime(match.startsAt)}</td>
               <td className="px-4 py-3">
                 <span
@@ -40,7 +55,7 @@ export function MatchTable({ matches }: { matches: ResolvedMatch[] }) {
                 </span>
               </td>
               <td className="px-4 py-3 font-medium text-stk-navy">
-                {match.homeTeam} <span className="font-normal text-stk-navy/50">vs</span> {match.awayTeam}
+                {match.homeTeam} <span className="font-normal text-stk-navy/65">vs</span> {match.awayTeam}
               </td>
               <td className="px-4 py-3 text-stk-navy/75">{match.refereeTeam ?? "—"}</td>
               <td className="px-4 py-3 tabular-nums text-stk-navy">

@@ -5,6 +5,7 @@ import type { QuickScoreMatch } from "@/app/components/standings-quick-score";
 import { isAdminAuthenticated } from "@/lib/auth";
 import { playoffCourt, playoffLocalTimeRangeLabel, playoffSetsLabelFr } from "@/lib/playoff-schedule";
 import { terrainPillClasses } from "@/lib/terrain-styles";
+import { getCurrentPlayingMatches } from "@/lib/current-playing";
 import {
   getPlayoffAfficheRows,
   getResolvedMatches,
@@ -13,6 +14,12 @@ import {
   officialSeasonRows,
   timeToStartsAtIso,
 } from "@/lib/tournament";
+
+export const dynamic = "force-dynamic";
+
+/** Distinct from terrain column tints (accent/sky/sage) so the creneau actuel row reads clearly. */
+const calendarCurrentRowClass =
+  "bg-amber-50 ring-2 ring-inset ring-amber-400/90 shadow-[inset_3px_0_0_0_rgb(217,119,6)] hover:bg-amber-100/90";
 
 const playoffsTemplate = [
   { stage: "Quart de finale 1", winnerTo: "Demi-finale 1", matchId: "QF1" },
@@ -56,6 +63,9 @@ function toQuickScoreMatch(m: Resolved | undefined): QuickScoreMatch | null {
 export default async function CalendarPage() {
   const [state, isAdmin] = await Promise.all([getState(), isAdminAuthenticated()]);
   const matches = getResolvedMatches(state);
+  const current = getCurrentPlayingMatches(state);
+  const currentStartsAt = current.startsAt;
+  const currentMatchIds = new Set(current.matches.map((m) => m.id));
   const byTimeAndCourt = new Map(matches.map((m) => [`${m.startsAt}-${m.court}`, m]));
   const playoffAfficheById = new Map(
     getPlayoffAfficheRows(state).map((row) => [row.matchId, row]),
@@ -115,9 +125,16 @@ export default async function CalendarPage() {
                   const match1 = byTimeAndCourt.get(`${startsAt}-1`);
                   const match2 = byTimeAndCourt.get(`${startsAt}-2`);
                   const match3 = byTimeAndCourt.get(`${startsAt}-3`);
+                  const isCurrentSeasonRow =
+                    currentStartsAt !== null && currentStartsAt === startsAt;
 
                   return (
-                    <tr key={row.time} className="hover:bg-stk-sky/20">
+                    <tr
+                      key={row.time}
+                      className={
+                        isCurrentSeasonRow ? calendarCurrentRowClass : "hover:bg-stk-sky/20"
+                      }
+                    >
                       <td className="whitespace-nowrap px-4 py-4 align-top font-semibold text-stk-navy sm:px-5 sm:py-5">
                         {formatRoundLabel(index + 1)}
                       </td>
@@ -186,8 +203,14 @@ export default async function CalendarPage() {
                 {playoffsTemplate.map((row) => {
                   const affiche = playoffAfficheById.get(row.matchId)!;
                   const court = playoffCourt(row.matchId);
+                  const isPlayoffCurrentRow = currentMatchIds.has(row.matchId);
                   return (
-                    <tr key={row.stage} className="hover:bg-stk-sky/20">
+                    <tr
+                      key={row.stage}
+                      className={
+                        isPlayoffCurrentRow ? calendarCurrentRowClass : "hover:bg-stk-sky/20"
+                      }
+                    >
                       <td className="px-4 py-4 align-top font-semibold text-stk-navy sm:px-5 sm:py-5">
                         <span className="block whitespace-nowrap">{row.stage}</span>
                         <span className="mt-1 block text-sm font-normal leading-snug text-stk-navy/70">

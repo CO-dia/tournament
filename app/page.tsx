@@ -2,12 +2,25 @@ import Link from "next/link";
 import { MainNav } from "@/app/components/nav";
 import { MatchTable } from "@/app/components/match-table";
 import { TeamNextGames } from "@/app/components/team-next-games";
+import { getCurrentPlayingMatches } from "@/lib/current-playing";
+import { formatGroupSlotRange } from "@/lib/montreal-time";
+import { playoffLocalTimeRangeLabel } from "@/lib/playoff-schedule";
 import { getResolvedMatches, getStandings, getState } from "@/lib/tournament";
+
+export const dynamic = "force-dynamic";
 
 export default async function Home() {
   const state = await getState();
   const matches = getResolvedMatches(state);
   const standings = getStandings(state);
+  const current = getCurrentPlayingMatches(state);
+  const currentTimeLabel =
+    current.matches.length > 0 && current.startsAt
+      ? current.matches[0]!.phase === "group"
+        ? formatGroupSlotRange(current.startsAt)
+        : playoffLocalTimeRangeLabel(current.matches[0]!.id)
+      : null;
+  const currentHighlightIds = new Set(current.matches.map((m) => m.id));
   const upcoming = matches.filter((match) => match.homeScore === null || match.awayScore === null).slice(0, 24);
   const bracketMatches = state.matches
     .filter((m) => m.phase !== "group")
@@ -54,6 +67,33 @@ export default async function Home() {
               </Link>
             </div>
           </div>
+        </section>
+
+        <section className="space-y-4">
+          <h2 className="text-xl font-semibold">Creneau actuel (horaire Montréal)</h2>
+          {current.matches.length > 0 ? (
+            <>
+              <p className="text-sm text-stk-navy/70">
+                Selon l&apos;heure locale, les matchs ci-dessous sont le bloc en cours. Si tous les matchs d&apos;un
+                meme horaire ont deja un score, le bloc suivant sans score complet est affiche.
+              </p>
+              {currentTimeLabel ? (
+                <p className="text-sm font-semibold text-stk-navy">
+                  Horaire : <span className="tabular-nums">{currentTimeLabel}</span>
+                </p>
+              ) : null}
+              <MatchTable matches={current.matches} highlightMatchIds={currentHighlightIds} />
+            </>
+          ) : current.allComplete ? (
+            <p className="rounded-xl border border-stk-sage/30 bg-stk-sage/20 px-4 py-3 text-sm text-stk-navy/80">
+              Tous les matchs ont un score saisi.
+            </p>
+          ) : (
+            <p className="rounded-xl border border-stk-navy/10 bg-stk-navy/[0.04] px-4 py-3 text-sm text-stk-navy/75">
+              Aucun creneau actuel a afficher (tous les matchs a partir de l&apos;horaire local ont deja un score, ou le
+              calendrier ne correspond pas encore a des matchs).
+            </p>
+          )}
         </section>
 
         <TeamNextGames slots={state.slots} matches={matches} bracketMatches={bracketMatches} />

@@ -63,7 +63,7 @@ export function CalendarMatchCell({
   }
 
   if (!match) {
-    return <span className="text-stk-navy/45">—</span>;
+    return <span className="text-stk-navy/65">—</span>;
   }
 
   const scored =
@@ -76,7 +76,7 @@ export function CalendarMatchCell({
     <>
       <div className="flex min-h-[4.5rem] flex-col justify-center gap-2">
         <p className="text-[0.95rem] font-medium leading-snug text-stk-navy">
-          {match.homeTeam} <span className="font-normal text-stk-navy/45">vs</span> {match.awayTeam}
+          {match.homeTeam} <span className="font-normal text-stk-navy/65">vs</span> {match.awayTeam}
         </p>
         <div className="flex flex-wrap items-end gap-x-3 gap-y-1">
           {scored ? (
@@ -86,7 +86,7 @@ export function CalendarMatchCell({
               <span>{match.awayScore}</span>
             </p>
           ) : (
-            <p className="text-xs font-medium uppercase tracking-wide text-stk-navy/45">A venir</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-stk-navy">A venir</p>
           )}
           {isAdmin ? (
             <button
