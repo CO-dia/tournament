@@ -57,7 +57,7 @@
       "homeSlot": 2,
       "awaySlot": 8,
       "refereeSlot": 5,
-      "homeScore": 13,
+      "homeScore": 9,
       "awayScore": 25
     },
     {
@@ -68,8 +68,8 @@
       "homeSlot": 3,
       "awaySlot": 7,
       "refereeSlot": 6,
-      "homeScore": 15,
-      "awayScore": 25
+      "homeScore": 25,
+      "awayScore": 20
     },
     {
       "id": "S4",
@@ -79,8 +79,8 @@
       "homeSlot": 4,
       "awaySlot": 6,
       "refereeSlot": 1,
-      "homeScore": 10,
-      "awayScore": 25
+      "homeScore": null,
+      "awayScore": null
     },
     {
       "id": "S5",
@@ -90,8 +90,8 @@
       "homeSlot": 2,
       "awaySlot": 5,
       "refereeSlot": 3,
-      "homeScore": 25,
-      "awayScore": 13
+      "homeScore": null,
+      "awayScore": null
     },
     {
       "id": "S6",
@@ -101,8 +101,8 @@
       "homeSlot": 8,
       "awaySlot": 9,
       "refereeSlot": 7,
-      "homeScore": 25,
-      "awayScore": 11
+      "homeScore": null,
+      "awayScore": null
     },
     {
       "id": "S7",
@@ -112,8 +112,8 @@
       "homeSlot": 1,
       "awaySlot": 8,
       "refereeSlot": 4,
-      "homeScore": 25,
-      "awayScore": 14
+      "homeScore": null,
+      "awayScore": null
     },
     {
       "id": "S8",
@@ -123,8 +123,8 @@
       "homeSlot": 2,
       "awaySlot": 7,
       "refereeSlot": 5,
-      "homeScore": 14,
-      "awayScore": 25
+      "homeScore": null,
+      "awayScore": null
     },
     {
       "id": "S9",
@@ -134,8 +134,8 @@
       "homeSlot": 3,
       "awaySlot": 6,
       "refereeSlot": 9,
-      "homeScore": 25,
-      "awayScore": 1
+      "homeScore": null,
+      "awayScore": null
     },
     {
       "id": "S10",
@@ -145,8 +145,8 @@
       "homeSlot": 4,
       "awaySlot": 5,
       "refereeSlot": 1,
-      "homeScore": 5,
-      "awayScore": 25
+      "homeScore": null,
+      "awayScore": null
     },
     {
       "id": "S11",
@@ -156,8 +156,8 @@
       "homeSlot": 3,
       "awaySlot": 9,
       "refereeSlot": 2,
-      "homeScore": 25,
-      "awayScore": 4
+      "homeScore": null,
+      "awayScore": null
     },
     {
       "id": "S12",
@@ -167,8 +167,8 @@
       "homeSlot": 7,
       "awaySlot": 8,
       "refereeSlot": 6,
-      "homeScore": 2,
-      "awayScore": 25
+      "homeScore": null,
+      "awayScore": null
     },
     {
       "id": "S13",
@@ -178,8 +178,8 @@
       "homeSlot": 1,
       "awaySlot": 7,
       "refereeSlot": 4,
-      "homeScore": 25,
-      "awayScore": 14
+      "homeScore": null,
+      "awayScore": null
     },
     {
       "id": "S14",
@@ -189,8 +189,8 @@
       "homeSlot": 2,
       "awaySlot": 6,
       "refereeSlot": 8,
-      "homeScore": 25,
-      "awayScore": 11
+      "homeScore": null,
+      "awayScore": null
     },
     {
       "id": "S15",
@@ -200,8 +200,8 @@
       "homeSlot": 3,
       "awaySlot": 5,
       "refereeSlot": 9,
-      "homeScore": 9,
-      "awayScore": 25
+      "homeScore": null,
+      "awayScore": null
     },
     {
       "id": "S16",
@@ -211,8 +211,8 @@
       "homeSlot": 2,
       "awaySlot": 4,
       "refereeSlot": 1,
-      "homeScore": 25,
-      "awayScore": 7
+      "homeScore": null,
+      "awayScore": null
     },
     {
       "id": "S17",
@@ -222,8 +222,8 @@
       "homeSlot": 5,
       "awaySlot": 8,
       "refereeSlot": 3,
-      "homeScore": 17,
-      "awayScore": 25
+      "homeScore": null,
+      "awayScore": null
     },
     {
       "id": "S18",
@@ -233,8 +233,8 @@
       "homeSlot": 6,
       "awaySlot": 7,
       "refereeSlot": 9,
-      "homeScore": 19,
-      "awayScore": 25
+      "homeScore": null,
+      "awayScore": null
     },
     {
       "id": "S19",
@@ -244,8 +244,8 @@
       "homeSlot": 1,
       "awaySlot": 6,
       "refereeSlot": 2,
-      "homeScore": 20,
-      "awayScore": 25
+      "homeScore": null,
+      "awayScore": null
     },
     {
       "id": "S20",
@@ -255,8 +255,8 @@
       "homeSlot": 3,
       "awaySlot": 4,
       "refereeSlot": 5,
-      "homeScore": 25,
-      "awayScore": 21
+      "homeScore": null,
+      "awayScore": null
     },
     {
       "id": "S21",
@@ -266,8 +266,8 @@
       "homeSlot": 1,
       "awaySlot": 5,
       "refereeSlot": 7,
-      "homeScore": 24,
-      "awayScore": 25
+      "homeScore": null,
+      "awayScore": null
     },
     {
       "id": "S22",
@@ -277,8 +277,8 @@
       "homeSlot": 4,
       "awaySlot": 9,
       "refereeSlot": 8,
-      "homeScore": 13,
-      "awayScore": 25
+      "homeScore": null,
+      "awayScore": null
     },
     {
       "id": "S23",
@@ -288,8 +288,8 @@
       "homeSlot": 7,
       "awaySlot": 9,
       "refereeSlot": 6,
-      "homeScore": 25,
-      "awayScore": 22
+      "homeScore": null,
+      "awayScore": null
     },
     {
       "id": "S24",
@@ -299,8 +299,8 @@
       "homeSlot": 8,
       "awaySlot": 3,
       "refereeSlot": 2,
-      "homeScore": 25,
-      "awayScore": 15
+      "homeScore": null,
+      "awayScore": null
     },
     {
       "id": "S25",
@@ -310,8 +310,8 @@
       "homeSlot": 5,
       "awaySlot": 6,
       "refereeSlot": 3,
-      "homeScore": 25,
-      "awayScore": 4
+      "homeScore": null,
+      "awayScore": null
     },
     {
       "id": "S26",
@@ -321,8 +321,8 @@
       "homeSlot": 2,
       "awaySlot": 9,
       "refereeSlot": 7,
-      "homeScore": 14,
-      "awayScore": 25
+      "homeScore": null,
+      "awayScore": null
     },
     {
       "id": "S27",
@@ -332,8 +332,8 @@
       "homeSlot": 4,
       "awaySlot": 1,
       "refereeSlot": 8,
-      "homeScore": 25,
-      "awayScore": 19
+      "homeScore": null,
+      "awayScore": null
     },
     {
       "id": "QF1",
@@ -341,19 +341,19 @@
       "startsAt": "2026-04-12T19:15:00.000Z",
       "court": 1,
       "homeSlot": 8,
-      "awaySlot": 6,
-      "homeScore": 25,
-      "awayScore": 10
+      "awaySlot": 5,
+      "homeScore": null,
+      "awayScore": null
     },
     {
       "id": "QF2",
       "phase": "quarter",
       "startsAt": "2026-04-12T19:15:00.000Z",
       "court": 2,
-      "homeSlot": 2,
-      "awaySlot": 7,
-      "homeScore": 5,
-      "awayScore": 25
+      "homeSlot": 7,
+      "awaySlot": 9,
+      "homeScore": null,
+      "awayScore": null
     },
     {
       "id": "QF3",
@@ -361,263 +361,37 @@
       "startsAt": "2026-04-12T19:15:00.000Z",
       "court": 3,
       "homeSlot": 1,
-      "awaySlot": 9,
-      "homeScore": 25,
-      "awayScore": 10
+      "awaySlot": 4,
+      "homeScore": null,
+      "awayScore": null
     },
     {
       "id": "QF4",
       "phase": "quarter",
       "startsAt": "2026-04-12T19:15:00.000Z",
       "court": 4,
-      "homeSlot": 5,
-      "awaySlot": 3,
-      "homeScore": 24,
-      "awayScore": 25
-    },
-    {
-      "id": "SF1",
-      "phase": "semi",
-      "startsAt": "2026-04-12T19:45:00.000Z",
-      "court": 1,
-      "homeSlot": 8,
-      "awaySlot": 7,
-      "homeScore": 25,
-      "awayScore": 10
-    },
-    {
-      "id": "SF2",
-      "phase": "semi",
-      "startsAt": "2026-04-12T19:45:00.000Z",
-      "court": 2,
-      "homeSlot": 1,
-      "awaySlot": 3,
-      "homeScore": 19,
-      "awayScore": 25
-    },
-    {
-      "id": "TP1",
-      "phase": "third",
-      "startsAt": "2026-04-12T20:15:00.000Z",
-      "court": 1,
-      "homeSlot": 1,
-      "awaySlot": 7,
+      "homeSlot": 3,
+      "awaySlot": 2,
       "homeScore": null,
       "awayScore": null
-    },
-    {
-      "id": "F1",
-      "phase": "final",
-      "startsAt": "2026-04-12T21:00:00.000Z",
-      "court": 1,
-      "homeSlot": 8,
-      "awaySlot": 3,
-      "homeScore": 25,
-      "awayScore": 20
     }
   ],
   "scoreHistory": [
     {
-      "recordedAt": "2026-04-08T04:29:18.840Z",
+      "recordedAt": "2026-04-11T01:43:25.986Z",
       "matchId": "S1",
       "homeScore": 25,
       "awayScore": 10
     },
     {
-      "recordedAt": "2026-04-08T04:29:32.446Z",
+      "recordedAt": "2026-04-11T01:43:33.562Z",
       "matchId": "S2",
-      "homeScore": 13,
-      "awayScore": 25
-    },
-    {
-      "recordedAt": "2026-04-08T04:29:49.795Z",
-      "matchId": "S3",
-      "homeScore": 15,
-      "awayScore": 25
-    },
-    {
-      "recordedAt": "2026-04-08T04:29:56.513Z",
-      "matchId": "S4",
-      "homeScore": 10,
-      "awayScore": 25
-    },
-    {
-      "recordedAt": "2026-04-08T04:30:04.615Z",
-      "matchId": "S5",
-      "homeScore": 25,
-      "awayScore": 13
-    },
-    {
-      "recordedAt": "2026-04-08T04:30:11.089Z",
-      "matchId": "S6",
-      "homeScore": 25,
-      "awayScore": 11
-    },
-    {
-      "recordedAt": "2026-04-08T04:30:17.275Z",
-      "matchId": "S7",
-      "homeScore": 25,
-      "awayScore": 14
-    },
-    {
-      "recordedAt": "2026-04-08T04:30:23.271Z",
-      "matchId": "S8",
-      "homeScore": 14,
-      "awayScore": 25
-    },
-    {
-      "recordedAt": "2026-04-08T04:30:30.679Z",
-      "matchId": "S9",
-      "homeScore": 25,
-      "awayScore": 1
-    },
-    {
-      "recordedAt": "2026-04-08T04:30:36.963Z",
-      "matchId": "S10",
-      "homeScore": 5,
-      "awayScore": 25
-    },
-    {
-      "recordedAt": "2026-04-08T04:30:42.770Z",
-      "matchId": "S11",
-      "homeScore": 25,
-      "awayScore": 4
-    },
-    {
-      "recordedAt": "2026-04-08T04:30:49.511Z",
-      "matchId": "S12",
-      "homeScore": 2,
-      "awayScore": 25
-    },
-    {
-      "recordedAt": "2026-04-08T04:30:56.980Z",
-      "matchId": "S13",
-      "homeScore": 25,
-      "awayScore": 14
-    },
-    {
-      "recordedAt": "2026-04-08T04:31:03.362Z",
-      "matchId": "S14",
-      "homeScore": 25,
-      "awayScore": 11
-    },
-    {
-      "recordedAt": "2026-04-08T04:31:10.496Z",
-      "matchId": "S15",
       "homeScore": 9,
       "awayScore": 25
     },
     {
-      "recordedAt": "2026-04-08T04:31:15.913Z",
-      "matchId": "S16",
-      "homeScore": 25,
-      "awayScore": 7
-    },
-    {
-      "recordedAt": "2026-04-08T04:31:20.163Z",
-      "matchId": "S17",
-      "homeScore": 17,
-      "awayScore": 25
-    },
-    {
-      "recordedAt": "2026-04-08T04:31:28.569Z",
-      "matchId": "S18",
-      "homeScore": 19,
-      "awayScore": 25
-    },
-    {
-      "recordedAt": "2026-04-08T04:31:35.192Z",
-      "matchId": "S19",
-      "homeScore": 20,
-      "awayScore": 25
-    },
-    {
-      "recordedAt": "2026-04-08T04:31:40.505Z",
-      "matchId": "S20",
-      "homeScore": 25,
-      "awayScore": 21
-    },
-    {
-      "recordedAt": "2026-04-08T04:31:45.971Z",
-      "matchId": "S21",
-      "homeScore": 24,
-      "awayScore": 25
-    },
-    {
-      "recordedAt": "2026-04-08T04:31:50.639Z",
-      "matchId": "S22",
-      "homeScore": 13,
-      "awayScore": 25
-    },
-    {
-      "recordedAt": "2026-04-08T04:31:57.270Z",
-      "matchId": "S23",
-      "homeScore": 25,
-      "awayScore": 22
-    },
-    {
-      "recordedAt": "2026-04-08T04:32:04.289Z",
-      "matchId": "S24",
-      "homeScore": 25,
-      "awayScore": 15
-    },
-    {
-      "recordedAt": "2026-04-08T04:32:15.355Z",
-      "matchId": "S25",
-      "homeScore": 25,
-      "awayScore": 4
-    },
-    {
-      "recordedAt": "2026-04-08T04:32:22.261Z",
-      "matchId": "S26",
-      "homeScore": 14,
-      "awayScore": 25
-    },
-    {
-      "recordedAt": "2026-04-08T04:32:28.210Z",
-      "matchId": "S27",
-      "homeScore": 25,
-      "awayScore": 19
-    },
-    {
-      "recordedAt": "2026-04-08T05:01:30.981Z",
-      "matchId": "QF1",
-      "homeScore": 25,
-      "awayScore": 10
-    },
-    {
-      "recordedAt": "2026-04-08T05:01:41.045Z",
-      "matchId": "QF2",
-      "homeScore": 5,
-      "awayScore": 25
-    },
-    {
-      "recordedAt": "2026-04-08T05:01:46.894Z",
-      "matchId": "QF3",
-      "homeScore": 25,
-      "awayScore": 10
-    },
-    {
-      "recordedAt": "2026-04-08T05:01:52.025Z",
-      "matchId": "QF4",
-      "homeScore": 24,
-      "awayScore": 25
-    },
-    {
-      "recordedAt": "2026-04-08T05:02:18.701Z",
-      "matchId": "SF1",
-      "homeScore": 25,
-      "awayScore": 10
-    },
-    {
-      "recordedAt": "2026-04-08T05:02:25.945Z",
-      "matchId": "SF2",
-      "homeScore": 19,
-      "awayScore": 25
-    },
-    {
-      "recordedAt": "2026-04-08T05:02:35.629Z",
-      "matchId": "F1",
+      "recordedAt": "2026-04-11T01:43:55.832Z",
+      "matchId": "S3",
       "homeScore": 25,
       "awayScore": 20
     }
